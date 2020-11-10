@@ -146,6 +146,7 @@ func (c *localClient) Watch(ctx context.Context, ch chan<- Event) error {
 		for {
 			resp, err := stream.Recv()
 			if err == io.EOF || err == context.Canceled {
+				close(ch)
 				break
 			}
 
@@ -161,7 +162,6 @@ func (c *localClient) Watch(ctx context.Context, ch chan<- Event) error {
 		}
 
 	}()
-	close(ch)
 	return nil
 }
 
