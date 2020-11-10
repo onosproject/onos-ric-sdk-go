@@ -134,6 +134,7 @@ func (c *localClient) Watch(ctx context.Context, ch chan<- Event) error {
 	req := subapi.WatchSubscriptionsRequest{}
 	stream, err := c.client.WatchSubscriptions(ctx, &req)
 	if err != nil {
+		close(ch)
 		return err
 	}
 
