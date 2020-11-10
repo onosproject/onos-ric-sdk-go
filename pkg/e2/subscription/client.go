@@ -97,7 +97,9 @@ func (c *localClient) Add(ctx context.Context, subscription *subapi.Subscription
 
 // Remove removes a subscription
 func (c *localClient) Remove(ctx context.Context, subscription *subapi.Subscription) error {
-	req := &subapi.RemoveSubscriptionRequest{}
+	req := &subapi.RemoveSubscriptionRequest{
+		ID: subscription.ID,
+	}
 
 	_, err := c.client.RemoveSubscription(ctx, req)
 	if err != nil {
