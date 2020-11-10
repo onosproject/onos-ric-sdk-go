@@ -5,12 +5,16 @@
 package subscription
 
 import (
-	"golang.org/x/net/context"
+	"io"
 
 	subapi "github.com/onosproject/onos-e2sub/api/e2/subscription/v1beta1"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
+
+var log = logging.GetLogger("e2", "subscription", "client")
 
 type Event struct {
 	// Type is the event type
@@ -141,10 +145,14 @@ func (c *localClient) Watch(ctx context.Context, ch chan<- Event) error {
 	go func() {
 		for {
 			resp, err := stream.Recv()
-			if err != nil {
-				close(ch)
+			if err == io.EOF || err == context.Canceled {
 				break
 			}
+
+			if err != nil {
+				log.Error("an error occurred in receiving subscription changes", err)
+			}
+
 			ch <- Event{
 				Type:         resp.Type,
 				Subscription: resp.Subscription,
@@ -153,6 +161,7 @@ func (c *localClient) Watch(ctx context.Context, ch chan<- Event) error {
 		}
 
 	}()
+	close(ch)
 	return nil
 }
 
