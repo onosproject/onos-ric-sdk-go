@@ -9,7 +9,7 @@ import (
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2"
 	"io"
 
-	regapi "github.com/onosproject/onos-e2sub/api/e2/registry/v1beta1"
+	regapi "github.com/onosproject/onos-e2sub/api/e2/endpoint/v1beta1"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -19,23 +19,23 @@ var log = logging.GetLogger("e2", "endpoint", "client")
 
 // Client provides an E2 end-point client interface
 type Client interface {
-	// Add adds a TerminationEndPoint
-	Add(ctx context.Context, endPoint *regapi.TerminationEndPoint) error
+	// Add adds a TerminationEndpoint
+	Add(ctx context.Context, endPoint *regapi.TerminationEndpoint) error
 
-	// Remove removes a TerminationEndPoint
-	Remove(ctx context.Context, endPoint *regapi.TerminationEndPoint) error
+	// Remove removes a TerminationEndpoint
+	Remove(ctx context.Context, endPoint *regapi.TerminationEndpoint) error
 
-	// Get returns a TerminationEndPoint based on a given TerminationEndPoint ID
-	Get(ctx context.Context, id regapi.ID) (*regapi.TerminationEndPoint, error)
+	// Get returns a TerminationEndpoint based on a given TerminationEndpoint ID
+	Get(ctx context.Context, id regapi.ID) (*regapi.TerminationEndpoint, error)
 
-	// List returns the list of existing TerminationEndPoints
-	List(ctx context.Context) ([]regapi.TerminationEndPoint, error)
+	// List returns the list of existing TerminationEndpoints
+	List(ctx context.Context) ([]regapi.TerminationEndpoint, error)
 
-	// Watch watches the TerminationEndPoint changes
+	// Watch watches the TerminationEndpoint changes
 	Watch(ctx context.Context, ch chan<- regapi.Event) error
 }
 
-// localClient TerminationEndPoint client
+// localClient TerminationEndpoint client
 type localClient struct {
 	conn   *grpc.ClientConn
 	client regapi.E2RegistryServiceClient
@@ -43,7 +43,7 @@ type localClient struct {
 
 // Destination determines E2 registry service endpoint
 type Destination struct {
-	// Addrs a slice of addresses by which a TerminationEndPoint service may be reached.
+	// Addrs a slice of addresses by which a TerminationEndpoint service may be reached.
 	Addrs []string
 }
 
@@ -74,9 +74,9 @@ func NewClient(ctx context.Context, dst Destination) (Client, error) {
 }
 
 // Add adds a new E2 termination end-point
-func (c *localClient) Add(ctx context.Context, endPoint *regapi.TerminationEndPoint) error {
+func (c *localClient) Add(ctx context.Context, endPoint *regapi.TerminationEndpoint) error {
 	req := &regapi.AddTerminationRequest{
-		EndPoint: endPoint,
+		Endpoint: endPoint,
 	}
 
 	_, err := c.client.AddTermination(ctx, req)
@@ -89,7 +89,7 @@ func (c *localClient) Add(ctx context.Context, endPoint *regapi.TerminationEndPo
 }
 
 // Remove removes an E2 termination end-point
-func (c *localClient) Remove(ctx context.Context, endPoint *regapi.TerminationEndPoint) error {
+func (c *localClient) Remove(ctx context.Context, endPoint *regapi.TerminationEndpoint) error {
 	req := &regapi.RemoveTerminationRequest{
 		ID: endPoint.ID,
 	}
@@ -103,7 +103,7 @@ func (c *localClient) Remove(ctx context.Context, endPoint *regapi.TerminationEn
 }
 
 // Get returns information about an E2 termination end-point
-func (c *localClient) Get(ctx context.Context, id regapi.ID) (*regapi.TerminationEndPoint, error) {
+func (c *localClient) Get(ctx context.Context, id regapi.ID) (*regapi.TerminationEndpoint, error) {
 	req := &regapi.GetTerminationRequest{
 		ID: id,
 	}
@@ -113,11 +113,11 @@ func (c *localClient) Get(ctx context.Context, id regapi.ID) (*regapi.Terminatio
 		return nil, err
 	}
 
-	return resp.EndPoint, nil
+	return resp.Endpoint, nil
 }
 
 // List returns the list of currently registered E2 termination end-points
-func (c *localClient) List(ctx context.Context) ([]regapi.TerminationEndPoint, error) {
+func (c *localClient) List(ctx context.Context) ([]regapi.TerminationEndpoint, error) {
 	req := &regapi.ListTerminationsRequest{}
 
 	resp, err := c.client.ListTerminations(ctx, req)
@@ -125,7 +125,7 @@ func (c *localClient) List(ctx context.Context) ([]regapi.TerminationEndPoint, e
 		return nil, err
 	}
 
-	return resp.EndPoints, nil
+	return resp.Endpoints, nil
 }
 
 // Watch watches for changes in the inventory of available E2T termination end-points
@@ -146,7 +146,7 @@ func (c *localClient) Watch(ctx context.Context, ch chan<- regapi.Event) error {
 			}
 
 			if err != nil {
-				log.Error("an error occurred in receiving TerminationEndPoint changes", err)
+				log.Error("an error occurred in receiving TerminationEndpoint changes", err)
 			}
 
 			ch <- resp.Event
