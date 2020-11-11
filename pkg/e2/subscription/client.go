@@ -5,6 +5,7 @@
 package subscription
 
 import (
+	"github.com/onosproject/onos-ric-sdk-go/pkg/e2"
 	"io"
 
 	subapi "github.com/onosproject/onos-e2sub/api/e2/subscription/v1beta1"
@@ -16,7 +17,7 @@ import (
 
 var log = logging.GetLogger("e2", "subscription", "client")
 
-// Client subscription client interface
+// Client is an E2 subscription service client interface
 type Client interface {
 	// Add adds a subscription
 	Add(ctx context.Context, subscription *subapi.Subscription) error
@@ -48,7 +49,7 @@ type Destination struct {
 
 // NewClient creates a new subscribe service client
 func NewClient(ctx context.Context, dst Destination) (Client, error) {
-	tlsConfig, err := getClientCredentials()
+	tlsConfig, err := e2.GetClientCredentials()
 	if err != nil {
 		return &localClient{}, err
 	}
@@ -101,7 +102,7 @@ func (c *localClient) Remove(ctx context.Context, subscription *subapi.Subscript
 	return nil
 }
 
-// GetSubscription returns information about a subscription
+// Get returns information about a subscription
 func (c *localClient) Get(ctx context.Context, id subapi.ID) (*subapi.Subscription, error) {
 	req := &subapi.GetSubscriptionRequest{
 		ID: id,
@@ -115,7 +116,7 @@ func (c *localClient) Get(ctx context.Context, id subapi.ID) (*subapi.Subscripti
 	return resp.Subscription, nil
 }
 
-// ListSubscriptions returns the list of current existing subscriptions
+// List returns the list of all subscriptions
 func (c *localClient) List(ctx context.Context) ([]subapi.Subscription, error) {
 	req := &subapi.ListSubscriptionsRequest{}
 
@@ -127,7 +128,7 @@ func (c *localClient) List(ctx context.Context) ([]subapi.Subscription, error) {
 	return resp.Subscriptions, nil
 }
 
-// Watch watches subscription changes
+// Watch watches for changes in the set of subscriptions
 func (c *localClient) Watch(ctx context.Context, ch chan<- subapi.Event) error {
 	req := subapi.WatchSubscriptionsRequest{}
 	stream, err := c.client.WatchSubscriptions(ctx, &req)
