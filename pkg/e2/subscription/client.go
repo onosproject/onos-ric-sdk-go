@@ -16,14 +16,6 @@ import (
 
 var log = logging.GetLogger("e2", "subscription", "client")
 
-type Event struct {
-	// Type is the event type
-	Type subapi.EventType
-
-	// Subscription is the changed subscription
-	Subscription subapi.Subscription
-}
-
 // Client subscription client interface
 type Client interface {
 	// Add adds a subscription
@@ -39,7 +31,7 @@ type Client interface {
 	List(ctx context.Context) ([]subapi.Subscription, error)
 
 	// Watch watches the subscription changes
-	Watch(ctx context.Context, ch chan<- Event) error
+	Watch(ctx context.Context, ch chan<- subapi.Event) error
 }
 
 // localClient subscription client
@@ -136,7 +128,7 @@ func (c *localClient) List(ctx context.Context) ([]subapi.Subscription, error) {
 }
 
 // Watch watches subscription changes
-func (c *localClient) Watch(ctx context.Context, ch chan<- Event) error {
+func (c *localClient) Watch(ctx context.Context, ch chan<- subapi.Event) error {
 	req := subapi.WatchSubscriptionsRequest{}
 	stream, err := c.client.WatchSubscriptions(ctx, &req)
 	if err != nil {
@@ -156,10 +148,7 @@ func (c *localClient) Watch(ctx context.Context, ch chan<- Event) error {
 				log.Error("an error occurred in receiving subscription changes", err)
 			}
 
-			ch <- Event{
-				Type:         resp.Type,
-				Subscription: resp.Subscription,
-			}
+			ch <- resp.Event
 
 		}
 
