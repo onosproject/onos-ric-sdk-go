@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package subscription
+package e2
 
 import (
 	"crypto/tls"
@@ -10,7 +10,7 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/certs"
 )
 
-func getClientCredentials() (*tls.Config, error) {
+func GetClientCredentials() (*tls.Config, error) {
 	cert, err := tls.X509KeyPair([]byte(certs.DefaultClientCrt), []byte(certs.DefaultClientKey))
 	if err != nil {
 		return nil, err
