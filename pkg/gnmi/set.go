@@ -85,7 +85,7 @@ func (s *Server) doReplaceOrUpdate(jsonTree map[string]interface{}, op pb.Update
 	fullPath := gnmiFullPath(prefix, path)
 	emptyNode, stat := ygotutils.NewNode(s.model.structRootType, fullPath)
 	if stat.GetCode() != int32(cpb.Code_OK) {
-		return nil, status.Errorf(codes.NotFound, "path %v is not found in the config structure: %v", fullPath, stat)
+		return nil, status.Errorf(codes.NotFound, "path %v is not found in the config structure: %v", fullPath.String(), stat.String())
 	}
 	var nodeVal interface{}
 	nodeStruct, ok := emptyNode.(ygot.ValidatedGoStruct)
@@ -228,5 +228,14 @@ func (s *Server) Set(ctx context.Context, req *pb.SetRequest) (*pb.SetResponse, 
 		Prefix:   req.GetPrefix(),
 		Response: results,
 	}
+
+	// TODO fix this that allows subscription on change works
+	/*for _, response := range setResponse.GetResponse() {
+		update := &pb.Update{
+			Path: response.GetPath(),
+		}
+		s.configUpdate <- update
+	}*/
+
 	return setResponse, nil
 }

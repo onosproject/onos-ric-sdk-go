@@ -23,13 +23,12 @@ var (
 
 // Server struct maintains the data structure for device config and implements the interface of gnmi server. It supports Capabilities, Get, and Set APIs.
 type Server struct {
-	model               *Model
-	callback            ConfigCallback
-	config              ygot.ValidatedGoStruct
-	ConfigUpdate        chan *pb.Update
-	mu                  sync.RWMutex // mu is the RW lock to protect the access to config
-	readOnlyUpdateValue *pb.Update
-	subscribers         map[string]*streamClient
+	model        *Model
+	callback     ConfigCallback
+	config       ygot.ValidatedGoStruct
+	configUpdate chan *pb.Update
+	mu           sync.RWMutex // mu is the RW lock to protect the access to config
+	subscribers  map[string]*streamClient
 }
 
 var (
@@ -37,10 +36,10 @@ var (
 )
 
 type streamClient struct {
-	target         string
-	sr             *pb.SubscribeRequest
-	stream         pb.GNMI_SubscribeServer
-	errChan        chan error
+	//target         string
+	sr     *pb.SubscribeRequest
+	stream pb.GNMI_SubscribeServer
+	//errChan        chan error
 	UpdateChan     chan *pb.Update
 	sampleInterval uint64
 }

@@ -6,11 +6,8 @@
 package gnmi
 
 import (
-	"bytes"
-	"compress/gzip"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -20,8 +17,8 @@ import (
 	"github.com/openconfig/ygot/ytypes"
 
 	log "github.com/golang/glog"
-	"github.com/golang/protobuf/proto"
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	//"github.com/golang/protobuf/proto"
+
 	"github.com/openconfig/goyang/pkg/yang"
 	"github.com/openconfig/ygot/ygot"
 	"google.golang.org/grpc/codes"
@@ -34,8 +31,13 @@ import (
 
 // getGNMIServiceVersion returns a pointer to the gNMI service version string.
 // The method is non-trivial because of the way it is defined in the proto file.
-func getGNMIServiceVersion() (*string, error) {
+
+// TODO Fix this function based on new protobuf
+/*func getGNMIServiceVersion() (*string, error) {
 	gzB, _ := (&pb.Update{}).Descriptor()
+
+	//gzB := pb.Update{}.ProtoReflect().Descriptor()
+
 	r, err := gzip.NewReader(bytes.NewReader(gzB))
 	if err != nil {
 		return nil, fmt.Errorf("error in initializing gzip reader: %v", err)
@@ -49,12 +51,13 @@ func getGNMIServiceVersion() (*string, error) {
 	if err := proto.Unmarshal(b, desc); err != nil {
 		return nil, fmt.Errorf("error in unmarshaling proto: %v", err)
 	}
-	ver, err := proto.GetExtension(desc.Options, pb.E_GnmiService)
+	ver := proto.GetExtension(desc.Options, pb.E_GnmiService).(string)
+	//ver, err := proto.GetExtension(desc.Options, pb.E_GnmiService).
 	if err != nil {
 		return nil, fmt.Errorf("error in getting version from proto extension: %v", err)
 	}
-	return ver.(*string), nil
-}
+	return &ver, nil
+}*/
 
 // getChildNode gets a node's child with corresponding schema specified by path
 // element. If not found and createIfNotExist is set as true, an empty node is
@@ -150,9 +153,10 @@ func getKeyedListEntry(node map[string]interface{}, elem *pb.PathElem, createIfN
 // gnmiFullPath builds the full path from the prefix and path.
 func gnmiFullPath(prefix, path *pb.Path) *pb.Path {
 	fullPath := &pb.Path{Origin: path.Origin}
-	if path.GetElement() != nil {
+	// Deprecated
+	/*if path.GetElement() != nil {
 		fullPath.Element = append(prefix.GetElement(), path.GetElement()...)
-	}
+	}*/
 	if path.GetElem() != nil {
 		fullPath.Elem = append(prefix.GetElem(), path.GetElem()...)
 	}
@@ -334,7 +338,7 @@ func (s *Server) sendResponse(response *pb.SubscribeResponse, stream pb.GNMI_Sub
 }
 
 // getUpdateForPath finds a leaf node in the tree based on a given path, build the update message and return it back to the collector
-func (s *Server) getUpdateForPath(fullPath *pb.Path) (*pb.Update, error) {
+/*func (s *Server) getUpdateForPath(fullPath *pb.Path) (*pb.Update, error) {
 
 	node, err := ytypes.GetNode(s.model.schemaTreeRoot, s.config, fullPath, nil)
 	if isNil(node) || err != nil {
@@ -398,7 +402,7 @@ func (s *Server) getUpdateForPath(fullPath *pb.Path) (*pb.Update, error) {
 
 	return nil, nil
 
-}
+}*/
 
 // getUpdate finds the node in the tree, build the update message and return it back to the collector
 func (s *Server) getUpdate(c *streamClient, subList *pb.SubscriptionList, path *pb.Path) (*pb.Update, error) {
@@ -408,8 +412,8 @@ func (s *Server) getUpdate(c *streamClient, subList *pb.SubscriptionList, path *
 	if prefix != nil {
 		fullPath = gnmiFullPath(prefix, path)
 	}
-	if fullPath.GetElem() == nil && fullPath.GetElement() != nil {
-		return nil, status.Error(codes.Unimplemented, "deprecated path element type is unsupported")
+	if fullPath.GetElem() == nil {
+		return nil, status.Error(codes.Unimplemented, "path element is nil")
 	}
 	node, err := ytypes.GetNode(s.model.schemaTreeRoot, s.config, fullPath, nil)
 	if isNil(node) || err != nil {
@@ -541,7 +545,7 @@ func (s *Server) listenForUpdates(c *streamClient) {
 
 // configEventProducer produces update events for stream subscribers.
 func (s *Server) listenToConfigEvents(request *pb.SubscriptionList) {
-	for update := range s.ConfigUpdate {
+	for update := range s.configUpdate {
 		for key, c := range s.subscribers {
 			if key == update.GetPath().String() {
 				newUpdateValue, err := s.getUpdate(c, request, update.GetPath())
@@ -624,7 +628,7 @@ func Contains(a []string, x string) bool {
 }
 
 // checkPathContainType checks if the path contains the data type element
-func checkPathContainType(fullPath *pb.Path, dataTypeString string) bool {
+/*func checkPathContainType(fullPath *pb.Path, dataTypeString string) bool {
 	elements := fullPath.GetElem()
 	var dataTypeFlag bool
 	dataTypeFlag = false
@@ -639,7 +643,7 @@ func checkPathContainType(fullPath *pb.Path, dataTypeString string) bool {
 		}
 	}
 	return dataTypeFlag
-}
+}*/
 
 // pruneConfigData prunes the given JSON subtree based on the given data type and path info.
 func pruneConfigData(data interface{}, dataType string, fullPath *pb.Path) interface{} {

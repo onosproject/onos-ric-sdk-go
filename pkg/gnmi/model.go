@@ -50,7 +50,7 @@ func NewModel(m []*pb.ModelData, t reflect.Type, r *yang.Entry, f JSONUnmarshale
 func (m *Model) NewConfigStruct(jsonConfig []byte) (ygot.ValidatedGoStruct, error) {
 	rootNode, stat := ygotutils.NewNode(m.structRootType, &pb.Path{})
 	if stat.GetCode() != int32(cpb.Code_OK) {
-		return nil, fmt.Errorf("cannot create root node: %v", stat)
+		return nil, fmt.Errorf("cannot create root node: %v", stat.String())
 	}
 
 	rootStruct, ok := rootNode.(ygot.ValidatedGoStruct)

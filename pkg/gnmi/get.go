@@ -50,7 +50,7 @@ func (s *Server) Get(ctx context.Context, req *pb.GetRequest) (*pb.GetResponse, 
 		// Gets the whole config data tree
 		node, err := ytypes.GetNode(s.model.schemaTreeRoot, s.config, &path, nil)
 		if isNil(node) || err != nil {
-			return nil, status.Errorf(codes.NotFound, "path %v not found", path)
+			return nil, status.Errorf(codes.NotFound, "path %v not found", path.String())
 		}
 
 		nodeStruct, _ := node[0].Data.(ygot.GoStruct)
@@ -83,12 +83,12 @@ func (s *Server) Get(ctx context.Context, req *pb.GetRequest) (*pb.GetResponse, 
 			fullPath = gnmiFullPath(prefix, path)
 		}
 
-		if fullPath.GetElem() == nil && fullPath.GetElement() != nil {
-			return nil, status.Error(codes.Unimplemented, "deprecated path element type is unsupported")
+		if fullPath.GetElem() == nil {
+			return nil, status.Error(codes.Unimplemented, "path element is nil")
 		}
 		node, err := ytypes.GetNode(s.model.schemaTreeRoot, s.config, fullPath, nil)
 		if isNil(node) || err != nil {
-			return nil, status.Errorf(codes.NotFound, "path %v not found", path)
+			return nil, status.Errorf(codes.NotFound, "path %v not found", path.String())
 		}
 
 		ts := time.Now().UnixNano()
@@ -110,7 +110,7 @@ func (s *Server) Get(ctx context.Context, req *pb.GetRequest) (*pb.GetResponse, 
 
 				}
 			}
-			if dataTypeFlag == false {
+			if !dataTypeFlag {
 				return nil, status.Error(codes.Internal, "The requested dataType is not valid")
 			}
 			var val *pb.TypedValue

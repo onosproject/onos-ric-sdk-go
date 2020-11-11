@@ -37,9 +37,10 @@ func (s *Service) Register(r *grpc.Server) {
 	}
 
 	server := &Server{
-		model:    s.model,
-		config:   rootStruct,
-		callback: s.callback,
+		model:        s.model,
+		config:       rootStruct,
+		callback:     s.callback,
+		configUpdate: make(chan *api.Update),
 	}
 	if server.config != nil && server.callback != nil {
 		if err := server.callback(rootStruct); err != nil {
