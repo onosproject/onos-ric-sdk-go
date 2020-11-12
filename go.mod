@@ -5,7 +5,7 @@ go 1.15
 require (
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/google/go-cmp v0.5.1 // indirect
-	github.com/onosproject/onos-e2sub v0.6.1
+	github.com/onosproject/onos-e2sub v0.6.2
 	github.com/onosproject/onos-lib-go v0.6.23
 	github.com/openconfig/gnmi v0.0.0-20200617225440-d2b4e6a45802
 	github.com/openconfig/goyang v0.2.1
@@ -17,3 +17,4 @@ require (
 	google.golang.org/grpc v1.33.1
 	google.golang.org/protobuf v1.25.0 // indirect
 )
+
