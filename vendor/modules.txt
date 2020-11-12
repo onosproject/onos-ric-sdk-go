@@ -74,7 +74,7 @@ github.com/magiconair/properties
 github.com/mitchellh/go-homedir
 # github.com/mitchellh/mapstructure v1.1.2
 github.com/mitchellh/mapstructure
-# github.com/onosproject/onos-e2sub v0.0.0 => /Users/tom/go/src/github.com/onosproject/onos-e2sub
+# github.com/onosproject/onos-e2sub v0.6.2
 ## explicit
 github.com/onosproject/onos-e2sub/api/e2/endpoint/v1beta1
 github.com/onosproject/onos-e2sub/api/e2/subscription/v1beta1
@@ -350,4 +350,3 @@ honnef.co/go/tools/staticcheck/vrp
 honnef.co/go/tools/stylecheck
 honnef.co/go/tools/unused
 honnef.co/go/tools/version
-# github.com/onosproject/onos-e2sub => /Users/tom/go/src/github.com/onosproject/onos-e2sub
