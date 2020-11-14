@@ -24,6 +24,7 @@ github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 ## explicit
 github.com/golang/glog
 # github.com/golang/protobuf v1.4.2
+## explicit
 github.com/golang/protobuf/proto
 github.com/golang/protobuf/protoc-gen-go/descriptor
 github.com/golang/protobuf/ptypes
@@ -39,6 +40,9 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
+# github.com/google/uuid v1.1.2
+## explicit
+github.com/google/uuid
 # github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
 github.com/grpc-ecosystem/go-grpc-middleware
 github.com/grpc-ecosystem/go-grpc-middleware/auth
@@ -81,6 +85,8 @@ github.com/onosproject/onos-e2sub/api/e2/subscription/v1beta1
 github.com/onosproject/onos-e2sub/api/e2/task/v1beta1
 # github.com/onosproject/onos-e2t v0.6.7-0.20201112232226-f90757e4b4c0
 ## explicit
+github.com/onosproject/onos-e2t/api/ricapi/e2/headers/v1beta1
+github.com/onosproject/onos-e2t/api/ricapi/e2/v1beta1
 # github.com/onosproject/onos-lib-go v0.6.23
 ## explicit
 github.com/onosproject/onos-lib-go/api/logging

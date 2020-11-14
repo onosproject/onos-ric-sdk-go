@@ -1,0 +1,47 @@
+/*
+SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
+
+SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
+*/
+
+syntax = "proto3";
+
+package ricapi.e2.headers.v1beta1;
+
+option go_package = "github.com/onosproject/onos-e2t/api/ricapi/e2/headers/v1beta1";
+
+message ServiceModelInfo {
+    string service_model_id = 1;
+}
+
+// RequestHeader a common request header for all requests including encoding type, client/xApp/session info, ordering info, etc
+message RequestHeader {
+    EncodingType encoding_type = 1;
+    ServiceModelInfo service_model_info = 2;
+
+    // TODO more fields should be added
+
+}
+
+// ResponseHeader a common response header for all responses including encoding type, client/xApp/session info, ordering info, etc
+message ResponseHeader {
+    EncodingType encoding_type = 1;
+    ServiceModelInfo service_model_info = 2;
+    ResponseStatus response_status = 3;
+    // TODO more fields should be added
+
+}
+
+// EncodingType determines encoding type for the response messages
+enum EncodingType {
+    ENCODING_TYPE_ASN1 = 0;
+    ENCODING_TYPE_PROTO = 1;
+}
+
+// ResponseStatus
+enum ResponseStatus {
+    RESPONSE_STATUS_FAILED = 0;
+    RESPONSE_STATUS_SUCCEEDED = 1;
+}
+
+

@@ -5,20 +5,20 @@
 package subscription
 
 import (
-	"github.com/onosproject/onos-ric-sdk-go/pkg/e2"
 	"io"
 
 	subapi "github.com/onosproject/onos-e2sub/api/e2/subscription/v1beta1"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 var log = logging.GetLogger("e2", "subscription", "client")
 
 // Client is an E2 subscription service client interface
 type Client interface {
+	io.Closer
+
 	// Add adds a subscription
 	Add(ctx context.Context, subscription *subapi.Subscription) error
 
@@ -35,46 +35,21 @@ type Client interface {
 	Watch(ctx context.Context, ch chan<- subapi.Event) error
 }
 
-// localClient subscription client
-type localClient struct {
-	conn   *grpc.ClientConn
+// NewClient creates a new subscribe service client
+func NewClient(conn *grpc.ClientConn) Client {
+	cl := subapi.NewE2SubscriptionServiceClient(conn)
+	return &subscriptionClient{
+		client: cl,
+	}
+}
+
+// subscriptionClient subscription client
+type subscriptionClient struct {
 	client subapi.E2SubscriptionServiceClient
 }
 
-// Destination determines subscription service endpoint
-type Destination struct {
-	// Addrs a slice of addresses by which a subscription service may be reached.
-	Addrs []string
-}
-
-// NewClient creates a new subscribe service client
-func NewClient(ctx context.Context, dst Destination) (Client, error) {
-	tlsConfig, err := e2.GetClientCredentials()
-	if err != nil {
-		return &localClient{}, err
-	}
-
-	opts := []grpc.DialOption{
-		grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
-	}
-
-	conn, err := grpc.DialContext(ctx, dst.Addrs[0], opts...)
-	if err != nil {
-		return &localClient{}, err
-	}
-
-	cl := subapi.NewE2SubscriptionServiceClient(conn)
-
-	client := localClient{
-		client: cl,
-		conn:   conn,
-	}
-
-	return &client, nil
-}
-
 // Add adds a subscription
-func (c *localClient) Add(ctx context.Context, subscription *subapi.Subscription) error {
+func (c *subscriptionClient) Add(ctx context.Context, subscription *subapi.Subscription) error {
 	req := &subapi.AddSubscriptionRequest{
 		Subscription: subscription,
 	}
@@ -89,7 +64,7 @@ func (c *localClient) Add(ctx context.Context, subscription *subapi.Subscription
 }
 
 // Remove removes a subscription
-func (c *localClient) Remove(ctx context.Context, subscription *subapi.Subscription) error {
+func (c *subscriptionClient) Remove(ctx context.Context, subscription *subapi.Subscription) error {
 	req := &subapi.RemoveSubscriptionRequest{
 		ID: subscription.ID,
 	}
@@ -103,7 +78,7 @@ func (c *localClient) Remove(ctx context.Context, subscription *subapi.Subscript
 }
 
 // Get returns information about a subscription
-func (c *localClient) Get(ctx context.Context, id subapi.ID) (*subapi.Subscription, error) {
+func (c *subscriptionClient) Get(ctx context.Context, id subapi.ID) (*subapi.Subscription, error) {
 	req := &subapi.GetSubscriptionRequest{
 		ID: id,
 	}
@@ -117,7 +92,7 @@ func (c *localClient) Get(ctx context.Context, id subapi.ID) (*subapi.Subscripti
 }
 
 // List returns the list of all subscriptions
-func (c *localClient) List(ctx context.Context) ([]subapi.Subscription, error) {
+func (c *subscriptionClient) List(ctx context.Context) ([]subapi.Subscription, error) {
 	req := &subapi.ListSubscriptionsRequest{}
 
 	resp, err := c.client.ListSubscriptions(ctx, req)
@@ -129,7 +104,7 @@ func (c *localClient) List(ctx context.Context) ([]subapi.Subscription, error) {
 }
 
 // Watch watches for changes in the set of subscriptions
-func (c *localClient) Watch(ctx context.Context, ch chan<- subapi.Event) error {
+func (c *subscriptionClient) Watch(ctx context.Context, ch chan<- subapi.Event) error {
 	req := subapi.WatchSubscriptionsRequest{}
 	stream, err := c.client.WatchSubscriptions(ctx, &req)
 	if err != nil {
@@ -158,8 +133,8 @@ func (c *localClient) Watch(ctx context.Context, ch chan<- subapi.Event) error {
 }
 
 // Close closes the client connection
-func (c *localClient) Close() error {
-	return c.conn.Close()
+func (c *subscriptionClient) Close() error {
+	return nil
 }
 
-var _ Client = &localClient{}
+var _ Client = &subscriptionClient{}

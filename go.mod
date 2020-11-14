@@ -4,9 +4,11 @@ go 1.15
 
 require (
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
+	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.5.1 // indirect
+	github.com/google/uuid v1.1.2
 	github.com/onosproject/onos-e2sub v0.6.4-0.20201112225438-8ff953e41a09
-	github.com/onosproject/onos-e2t v0.6.7-0.20201112232226-f90757e4b4c0 // indirect
+	github.com/onosproject/onos-e2t v0.6.7-0.20201112232226-f90757e4b4c0
 	github.com/onosproject/onos-lib-go v0.6.23
 	github.com/openconfig/gnmi v0.0.0-20200617225440-d2b4e6a45802
 	github.com/openconfig/goyang v0.2.1
