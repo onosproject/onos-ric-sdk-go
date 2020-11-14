@@ -5,7 +5,7 @@
 package subscription
 
 import (
-	"github.com/golang/protobuf/proto"
+	"github.com/gogo/protobuf/proto"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/node"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/sm"
 )
