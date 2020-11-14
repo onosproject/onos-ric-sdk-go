@@ -7,14 +7,12 @@ package subscriptiontask
 import (
 	epapi "github.com/onosproject/onos-e2sub/api/e2/endpoint/v1beta1"
 	subapi "github.com/onosproject/onos-e2sub/api/e2/subscription/v1beta1"
-	"github.com/onosproject/onos-ric-sdk-go/pkg/e2"
 	"io"
 
 	subtaskapi "github.com/onosproject/onos-e2sub/api/e2/task/v1beta1"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 var log = logging.GetLogger("e2", "subscription", "client")
@@ -85,6 +83,8 @@ func (o *filterEndpointOption) applyWatch(options *watchOptions) {
 
 // Client is an E2 subscription service client interface
 type Client interface {
+	io.Closer
+
 	// Get returns a subscription based on a given subscription ID
 	Get(ctx context.Context, id subtaskapi.ID) (*subtaskapi.SubscriptionTask, error)
 
@@ -95,46 +95,21 @@ type Client interface {
 	Watch(ctx context.Context, ch chan<- subtaskapi.Event, opts ...WatchOption) error
 }
 
-// localClient subscription client
-type localClient struct {
-	conn   *grpc.ClientConn
+// NewClient creates a new subscribe task service client
+func NewClient(conn *grpc.ClientConn) Client {
+	cl := subtaskapi.NewE2SubscriptionTaskServiceClient(conn)
+	return &subscriptionTaskClient{
+		client: cl,
+	}
+}
+
+// subscriptionTaskClient subscription client
+type subscriptionTaskClient struct {
 	client subtaskapi.E2SubscriptionTaskServiceClient
 }
 
-// Destination determines subscription service endpoint
-type Destination struct {
-	// Addrs a slice of addresses by which a subscription service may be reached.
-	Addrs []string
-}
-
-// NewClient creates a new subscribe service client
-func NewClient(ctx context.Context, dst Destination) (Client, error) {
-	tlsConfig, err := e2.GetClientCredentials()
-	if err != nil {
-		return &localClient{}, err
-	}
-
-	opts := []grpc.DialOption{
-		grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
-	}
-
-	conn, err := grpc.DialContext(ctx, dst.Addrs[0], opts...)
-	if err != nil {
-		return &localClient{}, err
-	}
-
-	cl := subtaskapi.NewE2SubscriptionTaskServiceClient(conn)
-
-	client := localClient{
-		client: cl,
-		conn:   conn,
-	}
-
-	return &client, nil
-}
-
 // Get returns information about a subscription
-func (c *localClient) Get(ctx context.Context, id subtaskapi.ID) (*subtaskapi.SubscriptionTask, error) {
+func (c *subscriptionTaskClient) Get(ctx context.Context, id subtaskapi.ID) (*subtaskapi.SubscriptionTask, error) {
 	req := &subtaskapi.GetSubscriptionTaskRequest{
 		ID: id,
 	}
@@ -148,7 +123,7 @@ func (c *localClient) Get(ctx context.Context, id subtaskapi.ID) (*subtaskapi.Su
 }
 
 // List returns the list of all subscriptions
-func (c *localClient) List(ctx context.Context, opts ...ListOption) ([]subtaskapi.SubscriptionTask, error) {
+func (c *subscriptionTaskClient) List(ctx context.Context, opts ...ListOption) ([]subtaskapi.SubscriptionTask, error) {
 	options := &listOptions{}
 	for _, opt := range opts {
 		opt.applyList(options)
@@ -167,7 +142,7 @@ func (c *localClient) List(ctx context.Context, opts ...ListOption) ([]subtaskap
 }
 
 // Watch watches for changes in the set of subscriptions
-func (c *localClient) Watch(ctx context.Context, ch chan<- subtaskapi.Event, opts ...WatchOption) error {
+func (c *subscriptionTaskClient) Watch(ctx context.Context, ch chan<- subtaskapi.Event, opts ...WatchOption) error {
 	options := &watchOptions{}
 	for _, opt := range opts {
 		opt.applyWatch(options)
@@ -205,8 +180,8 @@ func (c *localClient) Watch(ctx context.Context, ch chan<- subtaskapi.Event, opt
 }
 
 // Close closes the client connection
-func (c *localClient) Close() error {
-	return c.conn.Close()
+func (c *subscriptionTaskClient) Close() error {
+	return nil
 }
 
-var _ Client = &localClient{}
+var _ Client = &subscriptionTaskClient{}

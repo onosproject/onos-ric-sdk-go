@@ -1,0 +1,43 @@
+/*
+SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
+
+SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
+*/
+
+syntax = "proto3";
+
+// Package ricapi.e2.v1beta1 defines the interior gRPC interfaces for xApps to interact with E2T.
+package ricapi.e2.v1beta1;
+option go_package = "github.com/onosproject/onos-e2t/api/ricapi/e2/v1beta1";
+
+import "ricapi/e2/headers/v1beta1/headers.proto";
+import "gogoproto/gogo.proto";
+
+// Indication an indication message
+message Indication {
+}
+
+// ControlRequest
+message ControlRequest {
+}
+
+// ControlResponse
+message ControlResponse {
+}
+
+// E2TService provides means for enhanced interactions with the ONOS RIC E2 Termination service.
+service E2TService {
+    // Stream opens an indications stream
+    rpc Stream (stream StreamRequest) returns (stream StreamResponse);
+}
+
+message StreamRequest {
+    string app_id = 1 [(gogoproto.casttype) = "AppID", (gogoproto.customname) = "AppID"];
+    string instance_id = 2 [(gogoproto.casttype) = "InstanceID", (gogoproto.customname) = "InstanceID"];
+    string subscription_id = 3 [(gogoproto.casttype) = "SubscriptionID", (gogoproto.customname) = "SubscriptionID"];
+}
+
+message StreamResponse {
+    headers.v1beta1.ResponseHeader header = 1;
+    bytes payload = 2;
+}

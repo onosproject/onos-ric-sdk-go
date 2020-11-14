@@ -6,19 +6,19 @@ package endpoint
 
 import (
 	"github.com/onosproject/onos-lib-go/pkg/logging"
-	"github.com/onosproject/onos-ric-sdk-go/pkg/e2"
 	"io"
 
 	regapi "github.com/onosproject/onos-e2sub/api/e2/endpoint/v1beta1"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 var log = logging.GetLogger("e2", "endpoint", "client")
 
 // Client provides an E2 end-point client interface
 type Client interface {
+	io.Closer
+
 	// Add adds a TerminationEndpoint
 	Add(ctx context.Context, endPoint *regapi.TerminationEndpoint) error
 
@@ -35,46 +35,21 @@ type Client interface {
 	Watch(ctx context.Context, ch chan<- regapi.Event) error
 }
 
-// localClient TerminationEndpoint client
-type localClient struct {
-	conn   *grpc.ClientConn
+// NewClient creates a new termination endpoint service client
+func NewClient(conn *grpc.ClientConn) Client {
+	cl := regapi.NewE2RegistryServiceClient(conn)
+	return &endpointClient{
+		client: cl,
+	}
+}
+
+// endpointClient TerminationEndpoint client
+type endpointClient struct {
 	client regapi.E2RegistryServiceClient
 }
 
-// Destination determines E2 registry service endpoint
-type Destination struct {
-	// Addrs a slice of addresses by which a TerminationEndpoint service may be reached.
-	Addrs []string
-}
-
-// NewClient creates a new E2 termination registry service client
-func NewClient(ctx context.Context, dst Destination) (Client, error) {
-	tlsConfig, err := e2.GetClientCredentials()
-	if err != nil {
-		return &localClient{}, err
-	}
-
-	opts := []grpc.DialOption{
-		grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
-	}
-
-	conn, err := grpc.DialContext(ctx, dst.Addrs[0], opts...)
-	if err != nil {
-		return &localClient{}, err
-	}
-
-	cl := regapi.NewE2RegistryServiceClient(conn)
-
-	client := localClient{
-		client: cl,
-		conn:   conn,
-	}
-
-	return &client, nil
-}
-
 // Add adds a new E2 termination end-point
-func (c *localClient) Add(ctx context.Context, endPoint *regapi.TerminationEndpoint) error {
+func (c *endpointClient) Add(ctx context.Context, endPoint *regapi.TerminationEndpoint) error {
 	req := &regapi.AddTerminationRequest{
 		Endpoint: endPoint,
 	}
@@ -89,7 +64,7 @@ func (c *localClient) Add(ctx context.Context, endPoint *regapi.TerminationEndpo
 }
 
 // Remove removes an E2 termination end-point
-func (c *localClient) Remove(ctx context.Context, endPoint *regapi.TerminationEndpoint) error {
+func (c *endpointClient) Remove(ctx context.Context, endPoint *regapi.TerminationEndpoint) error {
 	req := &regapi.RemoveTerminationRequest{
 		ID: endPoint.ID,
 	}
@@ -103,7 +78,7 @@ func (c *localClient) Remove(ctx context.Context, endPoint *regapi.TerminationEn
 }
 
 // Get returns information about an E2 termination end-point
-func (c *localClient) Get(ctx context.Context, id regapi.ID) (*regapi.TerminationEndpoint, error) {
+func (c *endpointClient) Get(ctx context.Context, id regapi.ID) (*regapi.TerminationEndpoint, error) {
 	req := &regapi.GetTerminationRequest{
 		ID: id,
 	}
@@ -117,7 +92,7 @@ func (c *localClient) Get(ctx context.Context, id regapi.ID) (*regapi.Terminatio
 }
 
 // List returns the list of currently registered E2 termination end-points
-func (c *localClient) List(ctx context.Context) ([]regapi.TerminationEndpoint, error) {
+func (c *endpointClient) List(ctx context.Context) ([]regapi.TerminationEndpoint, error) {
 	req := &regapi.ListTerminationsRequest{}
 
 	resp, err := c.client.ListTerminations(ctx, req)
@@ -129,7 +104,7 @@ func (c *localClient) List(ctx context.Context) ([]regapi.TerminationEndpoint, e
 }
 
 // Watch watches for changes in the inventory of available E2T termination end-points
-func (c *localClient) Watch(ctx context.Context, ch chan<- regapi.Event) error {
+func (c *endpointClient) Watch(ctx context.Context, ch chan<- regapi.Event) error {
 	req := regapi.WatchTerminationsRequest{}
 	stream, err := c.client.WatchTerminations(ctx, &req)
 	if err != nil {
@@ -158,8 +133,8 @@ func (c *localClient) Watch(ctx context.Context, ch chan<- regapi.Event) error {
 }
 
 // Close closes the client connection
-func (c *localClient) Close() error {
-	return c.conn.Close()
+func (c *endpointClient) Close() error {
+	return nil
 }
 
-var _ Client = &localClient{}
+var _ Client = &endpointClient{}
