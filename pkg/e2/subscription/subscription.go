@@ -5,10 +5,10 @@
 package subscription
 
 import (
+	"github.com/gogo/protobuf/proto"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/encoding"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/node"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/sm"
-	"google.golang.org/protobuf/proto"
 )
 
 // Subscription is an E2 subscription
