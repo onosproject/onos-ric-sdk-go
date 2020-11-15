@@ -4,7 +4,18 @@
 
 package indication
 
+import "github.com/onosproject/onos-ric-sdk-go/pkg/e2/encoding"
+
 // Indication is an E2 indication
 type Indication struct {
+	// EncodingType payload encoding type
+	EncodingType encoding.Type
 
+	// Payload is the indication payload
+	Payload Payload
+}
+
+// E2 indication payload
+type Payload struct {
+	Value interface{}
 }

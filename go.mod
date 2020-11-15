@@ -3,7 +3,7 @@ module github.com/onosproject/onos-ric-sdk-go
 go 1.15
 
 require (
-	github.com/gogo/protobuf v1.3.1
+	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/google/go-cmp v0.5.1 // indirect
 	github.com/google/uuid v1.1.2
@@ -18,5 +18,5 @@ require (
 	golang.org/x/text v0.3.3 // indirect
 	google.golang.org/genproto v0.0.0-20200731012542-8145dea6a485
 	google.golang.org/grpc v1.33.1
-	google.golang.org/protobuf v1.25.0 // indirect
+	google.golang.org/protobuf v1.25.0
 )
