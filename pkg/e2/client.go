@@ -7,7 +7,9 @@ package e2
 import (
 	"context"
 	"fmt"
-	"github.com/gogo/protobuf/proto"
+
+	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/encoding"
+
 	"github.com/google/uuid"
 	epapi "github.com/onosproject/onos-e2sub/api/e2/endpoint/v1beta1"
 	subapi "github.com/onosproject/onos-e2sub/api/e2/subscription/v1beta1"
@@ -90,13 +92,45 @@ type e2Client struct {
 	conns      *connection.Manager
 }
 
+func getEncodingType(subscription subscription.Subscription) subapi.Encoding {
+	var encodingType subapi.Encoding
+	switch subscription.EncodingType.String() {
+	case encoding.ASN1.String():
+		encodingType = subapi.Encoding_ENCODING_ASN1
+	case encoding.PROTO.String():
+		encodingType = subapi.Encoding_ENCODING_PROTO
+	default:
+		encodingType = subapi.Encoding_ENCODING_PROTO
+
+	}
+	return encodingType
+
+}
+
+func getPayload(subscription subscription.Subscription) ([]byte, error) {
+	var payload []byte
+	var err error
+	switch subscription.EncodingType.String() {
+	case encoding.ASN1.String():
+		// TODO encode the payload in ASN.1
+	case encoding.PROTO.String():
+		payload, err = subscription.Payload.GetProtoValue()
+
+	default:
+		payload, err = subscription.Payload.GetProtoValue()
+
+	}
+	return payload, err
+}
+
 func (c *e2Client) Subscribe(ctx context.Context, subscription subscription.Subscription, ch chan<- indication.Indication) error {
 	id, err := uuid.NewUUID()
 	if err != nil {
 		return err
 	}
 
-	bytes, err := proto.Marshal(subscription.Payload)
+	encodingType := getEncodingType(subscription)
+	bytes, err := getPayload(subscription)
 	if err != nil {
 		return err
 	}
@@ -109,7 +143,7 @@ func (c *e2Client) Subscribe(ctx context.Context, subscription subscription.Subs
 			ID: subapi.ServiceModelID(subscription.ServiceModel.ID),
 		},
 		Payload: &subapi.Payload{
-			Encoding: subapi.Encoding_ENCODING_PROTO,
+			Encoding: encodingType,
 			Bytes:    bytes,
 		},
 	}
@@ -190,8 +224,13 @@ func (c *subscriptionClient) stream(epID epapi.ID) error {
 	}
 
 	go func() {
-		for range responseCh {
-			c.ch <- indication.Indication{}
+		for response := range responseCh {
+			c.ch <- indication.Indication{
+				EncodingType: encoding.Type(response.Header.EncodingType),
+				Payload: indication.Payload{
+					Value: response.Payload,
+				},
+			}
 		}
 	}()
 	return nil

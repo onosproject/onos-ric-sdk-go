@@ -5,13 +5,16 @@
 package subscription
 
 import (
-	"github.com/gogo/protobuf/proto"
+	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/encoding"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/node"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/sm"
+	"google.golang.org/protobuf/proto"
 )
 
 // Subscription is an E2 subscription
 type Subscription struct {
+	// EncodingType payload encoding type
+	EncodingType encoding.Type
 	// NodeID is the E2 node identifier
 	NodeID node.ID
 	// ServiceModel is the service model
@@ -21,4 +24,11 @@ type Subscription struct {
 }
 
 // Payload is an E2 subscription payload
-type Payload proto.Message
+type Payload struct {
+	Value interface{}
+}
+
+// GetProtoValue
+func (p *Payload) GetProtoValue() ([]byte, error) {
+	return proto.Marshal(p.Value.(proto.Message))
+}
