@@ -15,18 +15,14 @@ that will be established via a call to:
 ## E2 API
 To interact with E2 Nodes application must subscribe to a set of E2 SM messages via at least one, but possibly several calls to:
 
-`e2.Subscribe(subscription e2.Subscription, e2.IndicationHandler) error`
+`e2.Subscribe(subscription e2.Subscription, ch chan<- indication.Indication) error`
 
 In response to this call, the library will issue a subscription request to the E2 subscription manager and then will 
 start to internally manage a set of connections to the available E2 termination nodes by listening to notifications from 
 the E2 subscription manager to tear-down and setup connections as necessary. It will also begin to track which connections should
 be used for which E2 nodes.
 
-Incoming messages resulting from this subscription will be routed to the specified `e2.IndicationHandler` function:
-
-`e2.IndicationHandler(nodeId e2.NodeId, e2.Indication)`
-
-Different subscription requests can indicate different handlers.
+Incoming messages resulting from this subscription will be routed to the specified channel. Different subscription requests can indicate different channels.
 
 To send a message to an E2 node, the application can call the following:
 
