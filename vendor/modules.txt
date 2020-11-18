@@ -2,6 +2,12 @@
 github.com/BurntSushi/toml
 # github.com/Shopify/sarama v1.26.1
 github.com/Shopify/sarama
+# github.com/atomix/api v0.3.3
+github.com/atomix/api/proto/atomix/database
+github.com/atomix/api/proto/atomix/headers
+github.com/atomix/api/proto/atomix/primitive
+# github.com/atomix/go-client v0.4.1
+github.com/atomix/go-client/pkg/client/errors
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
 # github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -87,11 +93,12 @@ github.com/onosproject/onos-e2sub/api/e2/task/v1beta1
 ## explicit
 github.com/onosproject/onos-e2t/api/ricapi/e2/headers/v1beta1
 github.com/onosproject/onos-e2t/api/ricapi/e2/v1beta1
-# github.com/onosproject/onos-lib-go v0.6.23
+# github.com/onosproject/onos-lib-go v0.6.25
 ## explicit
 github.com/onosproject/onos-lib-go/api/logging
 github.com/onosproject/onos-lib-go/pkg/auth
 github.com/onosproject/onos-lib-go/pkg/certs
+github.com/onosproject/onos-lib-go/pkg/errors
 github.com/onosproject/onos-lib-go/pkg/grpcinterceptors
 github.com/onosproject/onos-lib-go/pkg/logging
 github.com/onosproject/onos-lib-go/pkg/logging/service

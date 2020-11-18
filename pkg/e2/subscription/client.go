@@ -5,6 +5,8 @@
 package subscription
 
 import (
+	"github.com/onosproject/onos-lib-go/pkg/errors"
+	"google.golang.org/grpc/status"
 	"io"
 
 	subapi "github.com/onosproject/onos-e2sub/api/e2/subscription/v1beta1"
@@ -56,6 +58,10 @@ func (c *subscriptionClient) Add(ctx context.Context, subscription *subapi.Subsc
 
 	_, err := c.client.AddSubscription(ctx, req)
 	if err != nil {
+		stat, ok := status.FromError(err)
+		if ok {
+			return errors.FromStatus(stat)
+		}
 		return err
 	}
 
@@ -71,6 +77,10 @@ func (c *subscriptionClient) Remove(ctx context.Context, subscription *subapi.Su
 
 	_, err := c.client.RemoveSubscription(ctx, req)
 	if err != nil {
+		stat, ok := status.FromError(err)
+		if ok {
+			return errors.FromStatus(stat)
+		}
 		return err
 	}
 
@@ -85,6 +95,10 @@ func (c *subscriptionClient) Get(ctx context.Context, id subapi.ID) (*subapi.Sub
 
 	resp, err := c.client.GetSubscription(ctx, req)
 	if err != nil {
+		stat, ok := status.FromError(err)
+		if ok {
+			return nil, errors.FromStatus(stat)
+		}
 		return nil, err
 	}
 
@@ -97,6 +111,10 @@ func (c *subscriptionClient) List(ctx context.Context) ([]subapi.Subscription, e
 
 	resp, err := c.client.ListSubscriptions(ctx, req)
 	if err != nil {
+		stat, ok := status.FromError(err)
+		if ok {
+			return nil, errors.FromStatus(stat)
+		}
 		return nil, err
 	}
 
@@ -108,26 +126,35 @@ func (c *subscriptionClient) Watch(ctx context.Context, ch chan<- subapi.Event) 
 	req := subapi.WatchSubscriptionsRequest{}
 	stream, err := c.client.WatchSubscriptions(ctx, &req)
 	if err != nil {
-		close(ch)
+		defer close(ch)
+		stat, ok := status.FromError(err)
+		if ok {
+			return errors.FromStatus(stat)
+		}
 		return err
 	}
 
 	go func() {
+		defer close(ch)
 		for {
 			resp, err := stream.Recv()
 			if err == io.EOF || err == context.Canceled {
-				close(ch)
 				break
 			}
 
 			if err != nil {
-				log.Error("an error occurred in receiving subscription changes", err)
+				stat, ok := status.FromError(err)
+				if ok {
+					err = errors.FromStatus(stat)
+					if errors.IsCanceled(err) || errors.IsTimeout(err) {
+						break
+					}
+				}
+				log.Error("An error occurred in receiving Subscription changes", err)
+			} else {
+				ch <- resp.Event
 			}
-
-			ch <- resp.Event
-
 		}
-
 	}()
 	return nil
 }

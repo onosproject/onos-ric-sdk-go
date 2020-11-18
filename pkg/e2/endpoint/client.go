@@ -5,7 +5,9 @@
 package endpoint
 
 import (
+	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"google.golang.org/grpc/status"
 	"io"
 
 	regapi "github.com/onosproject/onos-e2sub/api/e2/endpoint/v1beta1"
@@ -56,6 +58,10 @@ func (c *endpointClient) Add(ctx context.Context, endPoint *regapi.TerminationEn
 
 	_, err := c.client.AddTermination(ctx, req)
 	if err != nil {
+		stat, ok := status.FromError(err)
+		if ok {
+			return errors.FromStatus(stat)
+		}
 		return err
 	}
 
@@ -71,6 +77,10 @@ func (c *endpointClient) Remove(ctx context.Context, endPoint *regapi.Terminatio
 
 	_, err := c.client.RemoveTermination(ctx, req)
 	if err != nil {
+		stat, ok := status.FromError(err)
+		if ok {
+			return errors.FromStatus(stat)
+		}
 		return err
 	}
 
@@ -85,6 +95,10 @@ func (c *endpointClient) Get(ctx context.Context, id regapi.ID) (*regapi.Termina
 
 	resp, err := c.client.GetTermination(ctx, req)
 	if err != nil {
+		stat, ok := status.FromError(err)
+		if ok {
+			return nil, errors.FromStatus(stat)
+		}
 		return nil, err
 	}
 
@@ -97,6 +111,10 @@ func (c *endpointClient) List(ctx context.Context) ([]regapi.TerminationEndpoint
 
 	resp, err := c.client.ListTerminations(ctx, req)
 	if err != nil {
+		stat, ok := status.FromError(err)
+		if ok {
+			return nil, errors.FromStatus(stat)
+		}
 		return nil, err
 	}
 
@@ -108,26 +126,35 @@ func (c *endpointClient) Watch(ctx context.Context, ch chan<- regapi.Event) erro
 	req := regapi.WatchTerminationsRequest{}
 	stream, err := c.client.WatchTerminations(ctx, &req)
 	if err != nil {
-		close(ch)
+		defer close(ch)
+		stat, ok := status.FromError(err)
+		if ok {
+			return errors.FromStatus(stat)
+		}
 		return err
 	}
 
 	go func() {
+		defer close(ch)
 		for {
 			resp, err := stream.Recv()
 			if err == io.EOF || err == context.Canceled {
-				close(ch)
 				break
 			}
 
 			if err != nil {
-				log.Error("an error occurred in receiving TerminationEndpoint changes", err)
+				stat, ok := status.FromError(err)
+				if ok {
+					err = errors.FromStatus(stat)
+					if errors.IsCanceled(err) || errors.IsTimeout(err) {
+						break
+					}
+				}
+				log.Error("An error occurred in receiving Endpoint changes", err)
+			} else {
+				ch <- resp.Event
 			}
-
-			ch <- resp.Event
-
 		}
-
 	}()
 	return nil
 }
