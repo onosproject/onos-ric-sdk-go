@@ -84,10 +84,12 @@ github.com/magiconair/properties
 github.com/mitchellh/go-homedir
 # github.com/mitchellh/mapstructure v1.1.2
 github.com/mitchellh/mapstructure
-# github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201118220729-1f227212be88
+# github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201118220729-1f227212be88 => /Users/adibrastegarnia/go/src/github.com/onosproject/config-models/modelplugin/ric-1.0.0
 ## explicit
 github.com/onosproject/config-models/modelplugin/ric-1.0.0/modelplugin
 github.com/onosproject/config-models/modelplugin/ric-1.0.0/ric_1_0_0
+# github.com/onosproject/gnxi-simulators v0.6.4
+## explicit
 # github.com/onosproject/onos-e2sub v0.6.4-0.20201112225438-8ff953e41a09
 ## explicit
 github.com/onosproject/onos-e2sub/api/e2/endpoint/v1beta1
@@ -374,3 +376,5 @@ honnef.co/go/tools/staticcheck/vrp
 honnef.co/go/tools/stylecheck
 honnef.co/go/tools/unused
 honnef.co/go/tools/version
+# github.com/onosproject/config-models/modelplugin/ric-1.0.0 => /Users/adibrastegarnia/go/src/github.com/onosproject/config-models/modelplugin/ric-1.0.0
+# github.com/onosproject/config-models => /Users/adibrastegarnia/go/src/github.com/onosproject/config-models

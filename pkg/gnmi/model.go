@@ -11,8 +11,6 @@ import (
 	"reflect"
 	"sort"
 
-	ricmodelplugin "github.com/onosproject/config-models/modelplugin/ric-1.0.0/modelplugin"
-	ricmodelv1 "github.com/onosproject/config-models/modelplugin/ric-1.0.0/ric_1_0_0"
 	"github.com/openconfig/goyang/pkg/yang"
 	"github.com/openconfig/ygot/experimental/ygotutils"
 	"github.com/openconfig/ygot/ygot"
@@ -35,18 +33,6 @@ type Model struct {
 	schemaTreeRoot  *yang.Entry
 	jsonUnmarshaler JSONUnmarshaler
 	enumData        GoStructEnumData
-}
-
-// GetRicModel get ric model information
-// TODO this should be configured via helm chart later for an xApp or service
-func GetRicModel() *Model {
-	v1Models := NewModel(ricmodelplugin.ModelData,
-		reflect.TypeOf((*ricmodelv1.Device)(nil)),
-		ricmodelv1.SchemaTree["Device"],
-		ricmodelv1.Unmarshal,
-		map[string]map[int64]ygot.EnumDefinition{},
-	)
-	return v1Models
 }
 
 // NewModel returns an instance of Model struct.
