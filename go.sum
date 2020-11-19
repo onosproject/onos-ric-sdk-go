@@ -213,6 +213,8 @@ github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f/go.mod h1:ZdcZmHo+
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
 github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201118220729-1f227212be88 h1:THlGPJi/0FiSB4IH9vIinTwvdK/ghzKwsfS54odCk4M=
 github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201118220729-1f227212be88/go.mod h1:YEJMnpCNQs11z2mcoaN1g9pgNXCCdWLJJknEMMGPnH0=
+github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201119164938-25d8368c14ba h1:gLTD5g9Jwe0XmC/HmEjo1d2dl+W73uaaAn0RInJmMrA=
+github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201119164938-25d8368c14ba/go.mod h1:YEJMnpCNQs11z2mcoaN1g9pgNXCCdWLJJknEMMGPnH0=
 github.com/onosproject/gnxi-simulators v0.6.4 h1:ypJoSuHWZDnprq3LjxQyCIU6U6+fYDYFa0OqD/tDBk4=
 github.com/onosproject/gnxi-simulators v0.6.4/go.mod h1:ylZUP/OSR/Uqi2vhui/zae37LAFAFtUDfND/0hEWxas=
 github.com/onosproject/onos-e2sub v0.6.4-0.20201112225438-8ff953e41a09 h1:pchlQIJnL9HRcrjl3zX8bYVtVU/EYWmuQs5WA6rLMRY=
