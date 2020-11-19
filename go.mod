@@ -7,6 +7,7 @@ require (
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/google/go-cmp v0.5.1 // indirect
 	github.com/google/uuid v1.1.2
+	github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201118220729-1f227212be88
 	github.com/onosproject/onos-e2sub v0.6.4-0.20201112225438-8ff953e41a09
 	github.com/onosproject/onos-e2t v0.6.7-0.20201112232226-f90757e4b4c0
 	github.com/onosproject/onos-lib-go v0.6.25
@@ -17,6 +18,7 @@ require (
 	golang.org/x/sys v0.0.0-20200803210538-64077c9b5642 // indirect
 	golang.org/x/text v0.3.3 // indirect
 	google.golang.org/genproto v0.0.0-20200731012542-8145dea6a485
-	google.golang.org/grpc v1.33.1
-	google.golang.org/protobuf v1.25.0 // indirect
+	google.golang.org/grpc v1.33.2
+	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
+
