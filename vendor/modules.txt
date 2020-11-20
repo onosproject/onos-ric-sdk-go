@@ -84,6 +84,12 @@ github.com/magiconair/properties
 github.com/mitchellh/go-homedir
 # github.com/mitchellh/mapstructure v1.1.2
 github.com/mitchellh/mapstructure
+# github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201119164938-25d8368c14ba
+## explicit
+github.com/onosproject/config-models/modelplugin/ric-1.0.0/modelplugin
+github.com/onosproject/config-models/modelplugin/ric-1.0.0/ric_1_0_0
+# github.com/onosproject/gnxi-simulators v0.6.4
+## explicit
 # github.com/onosproject/onos-e2sub v0.6.4-0.20201112225438-8ff953e41a09
 ## explicit
 github.com/onosproject/onos-e2sub/api/e2/endpoint/v1beta1
@@ -105,6 +111,7 @@ github.com/onosproject/onos-lib-go/pkg/logging/service
 github.com/onosproject/onos-lib-go/pkg/northbound
 # github.com/openconfig/gnmi v0.0.0-20200617225440-d2b4e6a45802
 ## explicit
+github.com/openconfig/gnmi/ctree
 github.com/openconfig/gnmi/errlist
 github.com/openconfig/gnmi/proto/gnmi
 github.com/openconfig/gnmi/proto/gnmi_ext
@@ -116,7 +123,9 @@ github.com/openconfig/goyang/pkg/yang
 # github.com/openconfig/ygot v0.8.11
 ## explicit
 github.com/openconfig/ygot/experimental/ygotutils
+github.com/openconfig/ygot/genutil
 github.com/openconfig/ygot/util
+github.com/openconfig/ygot/ygen
 github.com/openconfig/ygot/ygot
 github.com/openconfig/ygot/ytypes
 # github.com/pelletier/go-toml v1.2.0
@@ -215,7 +224,7 @@ google.golang.org/appengine/urlfetch
 ## explicit
 google.golang.org/genproto/googleapis/rpc/code
 google.golang.org/genproto/googleapis/rpc/status
-# google.golang.org/grpc v1.33.1
+# google.golang.org/grpc v1.33.2
 ## explicit
 google.golang.org/grpc
 google.golang.org/grpc/attributes
@@ -260,7 +269,6 @@ google.golang.org/grpc/stats
 google.golang.org/grpc/status
 google.golang.org/grpc/tap
 # google.golang.org/protobuf v1.25.0
-## explicit
 google.golang.org/protobuf/encoding/prototext
 google.golang.org/protobuf/encoding/protowire
 google.golang.org/protobuf/internal/descfmt
@@ -339,7 +347,8 @@ gopkg.in/square/go-jose.v1/json
 gopkg.in/square/go-jose.v2
 gopkg.in/square/go-jose.v2/cipher
 gopkg.in/square/go-jose.v2/json
-# gopkg.in/yaml.v2 v2.2.8
+# gopkg.in/yaml.v2 v2.3.0
+## explicit
 gopkg.in/yaml.v2
 # honnef.co/go/tools v0.0.1-2019.2.3
 honnef.co/go/tools/arg

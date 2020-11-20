@@ -12,8 +12,12 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-// NewService creates a new subscription service
-func NewService(model *Model, config []byte, callback ConfigCallback) northbound.Service {
+// NewService creates a new gnmi service
+func NewService(info ModelInfo) northbound.Service {
+	return newService(GetModel(info), nil, nil)
+}
+
+func newService(model *Model, config []byte, callback ConfigCallback) northbound.Service {
 	return &Service{
 		model:    model,
 		config:   config,
