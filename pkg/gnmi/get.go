@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/openconfig/ygot/util"
+
 	"github.com/openconfig/ygot/ytypes"
 
 	log "github.com/golang/glog"
@@ -86,14 +88,16 @@ func (s *Server) Get(ctx context.Context, req *pb.GetRequest) (*pb.GetResponse, 
 		if fullPath.GetElem() == nil {
 			return nil, status.Error(codes.Unimplemented, "path element is nil")
 		}
-		node, err := ytypes.GetNode(s.model.schemaTreeRoot, s.config, fullPath, nil)
-		if isNil(node) || err != nil {
-			return nil, status.Errorf(codes.NotFound, "path %v not found", path.String())
+
+		nodes, err := ytypes.GetNode(s.model.schemaTreeRoot, s.config, fullPath)
+		if len(nodes) == 0 || err != nil || util.IsValueNil(nodes[0].Data) {
+			return nil, status.Errorf(codes.NotFound, "path %v not found: %v", fullPath, err)
 		}
+		node := nodes[0].Data
 
 		ts := time.Now().UnixNano()
 
-		nodeStruct, ok := node[0].Data.(ygot.GoStruct)
+		nodeStruct, ok := node.(ygot.GoStruct)
 		dataTypeFlag := false
 		// Return leaf node.
 		if !ok {
@@ -126,23 +130,23 @@ func (s *Server) Get(ctx context.Context, req *pb.GetRequest) (*pb.GetResponse, 
 
 			case reflect.Slice:
 				var err error
-				switch kind := reflect.ValueOf(node[0].Data).Kind(); kind {
+				switch kind := reflect.ValueOf(node).Kind(); kind {
 				case reflect.Int64:
 					//fmt.Println(reflect.TypeOf(node[0].Data).Elem())
-					enumMap, ok := s.model.enumData[reflect.TypeOf(node[0].Data).Name()]
+					enumMap, ok := s.model.enumData[reflect.TypeOf(node).Name()]
 					if !ok {
 						return nil, status.Error(codes.Internal, "not a GoStruct enumeration type")
 					}
 					val = &pb.TypedValue{
 						Value: &pb.TypedValue_StringVal{
-							StringVal: enumMap[reflect.ValueOf(node[0].Data).Int()].Name,
+							StringVal: enumMap[reflect.ValueOf(nodes[0].Data).Int()].Name,
 						},
 					}
 				default:
-					if !reflect.ValueOf(node[0].Data).Elem().IsValid() {
+					if !reflect.ValueOf(node).Elem().IsValid() {
 						return nil, status.Errorf(codes.NotFound, "path %v not found", path)
 					}
-					val, err = value.FromScalar(reflect.ValueOf(node[0].Data).Elem().Interface())
+					val, err = value.FromScalar(reflect.ValueOf(node).Elem().Interface())
 					if err != nil {
 						msg := fmt.Sprintf("leaf node %v does not contain a scalar type value: %v", path, err)
 						log.Error(msg)
