@@ -1,3 +1,5 @@
+# cloud.google.com/go v0.43.0
+## explicit
 # github.com/BurntSushi/toml v0.3.1
 github.com/BurntSushi/toml
 # github.com/Shopify/sarama v1.26.1
@@ -50,6 +52,7 @@ github.com/google/go-cmp/cmp/internal/value
 ## explicit
 github.com/google/uuid
 # github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
+## explicit
 github.com/grpc-ecosystem/go-grpc-middleware
 github.com/grpc-ecosystem/go-grpc-middleware/auth
 github.com/grpc-ecosystem/go-grpc-middleware/util/metautils
@@ -88,15 +91,12 @@ github.com/mitchellh/mapstructure
 ## explicit
 github.com/onosproject/config-models/modelplugin/ric-1.0.0/modelplugin
 github.com/onosproject/config-models/modelplugin/ric-1.0.0/ric_1_0_0
-# github.com/onosproject/onos-e2sub v0.6.4-0.20201112225438-8ff953e41a09
+# github.com/onosproject/onos-api/go v0.6.1
 ## explicit
-github.com/onosproject/onos-e2sub/api/e2/endpoint/v1beta1
-github.com/onosproject/onos-e2sub/api/e2/subscription/v1beta1
-github.com/onosproject/onos-e2sub/api/e2/task/v1beta1
-# github.com/onosproject/onos-e2t v0.6.7-0.20201112232226-f90757e4b4c0
-## explicit
-github.com/onosproject/onos-e2t/api/ricapi/e2/headers/v1beta1
-github.com/onosproject/onos-e2t/api/ricapi/e2/v1beta1
+github.com/onosproject/onos-api/go/onos/e2sub/endpoint
+github.com/onosproject/onos-api/go/onos/e2sub/subscription
+github.com/onosproject/onos-api/go/onos/e2sub/task
+github.com/onosproject/onos-api/go/onos/e2t/e2
 # github.com/onosproject/onos-lib-go v0.6.25
 ## explicit
 github.com/onosproject/onos-lib-go/api/logging
@@ -130,12 +130,17 @@ github.com/pelletier/go-toml
 # github.com/pierrec/lz4 v2.4.1+incompatible
 github.com/pierrec/lz4
 github.com/pierrec/lz4/internal/xxh32
+# github.com/pkg/errors v0.9.1
+## explicit
 # github.com/pquerna/cachecontrol v0.0.0-20180517163645-1555304b9b35
 github.com/pquerna/cachecontrol
 github.com/pquerna/cachecontrol/cacheobject
 # github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563
 github.com/rcrowley/go-metrics
+# github.com/smartystreets/assertions v1.0.0
+## explicit
 # github.com/spf13/afero v1.2.2
+## explicit
 github.com/spf13/afero
 github.com/spf13/afero/mem
 # github.com/spf13/cast v1.3.0
@@ -143,9 +148,13 @@ github.com/spf13/cast
 # github.com/spf13/jwalterweatherman v1.0.0
 github.com/spf13/jwalterweatherman
 # github.com/spf13/pflag v1.0.5
+## explicit
 github.com/spf13/pflag
 # github.com/spf13/viper v1.6.2
+## explicit
 github.com/spf13/viper
+# github.com/stretchr/testify v1.5.1
+## explicit
 # github.com/subosito/gotenv v1.2.0
 github.com/subosito/gotenv
 # go.uber.org/atomic v1.5.0
@@ -194,7 +203,8 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# golang.org/x/tools v0.0.0-20200113040837-eac381796e91
+# golang.org/x/tools v0.0.0-20200522201501-cb1345f3a375
+## explicit
 golang.org/x/tools/go/analysis
 golang.org/x/tools/go/analysis/passes/inspect
 golang.org/x/tools/go/ast/astutil
@@ -206,9 +216,16 @@ golang.org/x/tools/go/internal/packagesdriver
 golang.org/x/tools/go/packages
 golang.org/x/tools/go/types/objectpath
 golang.org/x/tools/go/types/typeutil
-golang.org/x/tools/internal/fastwalk
-golang.org/x/tools/internal/gopathwalk
-golang.org/x/tools/internal/semver
+golang.org/x/tools/internal/analysisinternal
+golang.org/x/tools/internal/event
+golang.org/x/tools/internal/event/core
+golang.org/x/tools/internal/event/keys
+golang.org/x/tools/internal/event/label
+golang.org/x/tools/internal/gocommand
+golang.org/x/tools/internal/packagesinternal
+# golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
+golang.org/x/xerrors
+golang.org/x/xerrors/internal
 # google.golang.org/appengine v1.6.1
 google.golang.org/appengine/internal
 google.golang.org/appengine/internal/base

@@ -5,13 +5,14 @@
 package subscriptiontask
 
 import (
-	epapi "github.com/onosproject/onos-e2sub/api/e2/endpoint/v1beta1"
-	subapi "github.com/onosproject/onos-e2sub/api/e2/subscription/v1beta1"
-	"github.com/onosproject/onos-lib-go/pkg/errors"
-	"google.golang.org/grpc/status"
 	"io"
 
-	subtaskapi "github.com/onosproject/onos-e2sub/api/e2/task/v1beta1"
+	epapi "github.com/onosproject/onos-api/go/onos/e2sub/endpoint"
+	subapi "github.com/onosproject/onos-api/go/onos/e2sub/subscription"
+	"github.com/onosproject/onos-lib-go/pkg/errors"
+	"google.golang.org/grpc/status"
+
+	subtaskapi "github.com/onosproject/onos-api/go/onos/e2sub/task"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"

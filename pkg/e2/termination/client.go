@@ -5,8 +5,9 @@
 package termination
 
 import (
-	e2tapi "github.com/onosproject/onos-e2t/api/ricapi/e2/v1beta1"
 	"io"
+
+	e2tapi "github.com/onosproject/onos-api/go/onos/e2t/e2"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"golang.org/x/net/context"
