@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 	"io"
 
-	regapi "github.com/onosproject/onos-e2sub/api/e2/endpoint/v1beta1"
+	regapi "github.com/onosproject/onos-api/go/onos/e2sub/endpoint"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
