@@ -14,7 +14,7 @@ import (
 	epapi "github.com/onosproject/onos-api/go/onos/e2sub/endpoint"
 	subapi "github.com/onosproject/onos-api/go/onos/e2sub/subscription"
 	subtaskapi "github.com/onosproject/onos-api/go/onos/e2sub/task"
-	e2tapi "github.com/onosproject/onos-e2t/api/ricapi/e2/v1beta1"
+	e2tapi "github.com/onosproject/onos-api/go/onos/e2t/e2"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/app"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/connection"
