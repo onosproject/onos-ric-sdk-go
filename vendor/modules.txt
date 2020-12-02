@@ -88,6 +88,11 @@ github.com/mitchellh/mapstructure
 ## explicit
 github.com/onosproject/config-models/modelplugin/ric-1.0.0/modelplugin
 github.com/onosproject/config-models/modelplugin/ric-1.0.0/ric_1_0_0
+# github.com/onosproject/onos-api/go v0.6.7
+## explicit
+github.com/onosproject/onos-api/go/onos/e2sub/endpoint
+github.com/onosproject/onos-api/go/onos/e2sub/subscription
+github.com/onosproject/onos-api/go/onos/e2sub/task
 # github.com/onosproject/onos-e2sub v0.6.4-0.20201112225438-8ff953e41a09
 ## explicit
 github.com/onosproject/onos-e2sub/api/e2/endpoint/v1beta1

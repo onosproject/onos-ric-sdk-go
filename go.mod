@@ -8,6 +8,7 @@ require (
 	github.com/google/go-cmp v0.5.1 // indirect
 	github.com/google/uuid v1.1.2
 	github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201119164938-25d8368c14ba
+	github.com/onosproject/onos-api/go v0.6.7
 	github.com/onosproject/onos-e2sub v0.6.4-0.20201112225438-8ff953e41a09
 	github.com/onosproject/onos-e2t v0.6.7-0.20201112232226-f90757e4b4c0
 	github.com/onosproject/onos-lib-go v0.6.25

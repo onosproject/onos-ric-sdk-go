@@ -9,7 +9,8 @@ import (
 	"google.golang.org/grpc/status"
 	"io"
 
-	subapi "github.com/onosproject/onos-e2sub/api/e2/subscription/v1beta1"
+	subapi "github.com/onosproject/onos-api/go/onos/e2sub/subscription"
+
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
