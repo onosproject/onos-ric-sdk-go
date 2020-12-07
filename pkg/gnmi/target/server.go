@@ -28,6 +28,7 @@ type GnmiService interface {
 func newService(model *Model, config []byte, callback ConfigCallback) GnmiService {
 	rootStruct, err := model.NewConfigStruct(config)
 	if err != nil {
+		log.Errorf("initial config cannot be initialized", config)
 	}
 	server := &Server{
 		model:        model,

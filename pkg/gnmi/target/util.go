@@ -541,13 +541,9 @@ func (s *Server) listenForUpdates(c *streamClient) {
 }
 
 func (s *Server) WatchConfigUpdates(ch chan *pb.Update) {
-	for {
-		select {
-		case update := <-s.configUpdate:
-			log.Info("Get update", update)
-			ch <- update
-
-		}
+	for update := range s.configUpdate {
+		log.Info("Get update", update)
+		ch <- update
 	}
 }
 
