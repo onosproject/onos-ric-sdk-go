@@ -228,7 +228,8 @@ func (c *subscriptionClient) stream(epID epapi.ID) error {
 			c.ch <- indication.Indication{
 				EncodingType: encoding.Type(response.Header.EncodingType),
 				Payload: indication.Payload{
-					Value: response.Payload,
+					Header: response.Header.IndicationHeader,
+					Message: response.IndicationMessage,
 				},
 			}
 		}

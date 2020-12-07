@@ -10,7 +10,7 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0 // indirect
 	github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201119164938-25d8368c14ba
-	github.com/onosproject/onos-api/go v0.6.1
+	github.com/onosproject/onos-api/go v0.6.8
 	github.com/onosproject/onos-lib-go v0.6.25
 	github.com/openconfig/gnmi v0.0.0-20200617225440-d2b4e6a45802
 	github.com/openconfig/goyang v0.2.1

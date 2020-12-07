@@ -17,5 +17,6 @@ type Indication struct {
 
 // E2 indication payload
 type Payload struct {
-	Value interface{}
+	Header []byte
+	Message []byte
 }
