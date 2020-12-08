@@ -9,8 +9,6 @@ import (
 	"os"
 )
 
-const configDir = ".onos"
-
 type Config struct {
 	Config map[string]interface{}
 }
