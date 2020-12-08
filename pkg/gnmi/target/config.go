@@ -5,40 +5,29 @@
 package target
 
 import (
-	"github.com/mitchellh/go-homedir"
-	"github.com/spf13/viper"
+	"io/ioutil"
+	"os"
 )
 
 const configDir = ".onos"
 
 type Config struct {
+	Config map[string]interface{}
 }
 
-// load loads the configuration
-func load(config *Config) error {
-	home, err := homedir.Dir()
+// load loads the initial configuration
+func load() ([]byte, error) {
+	jsonFile, err := os.Open("/etc/onos/config/config.json")
 	if err != nil {
-		return err
+		return nil, err
 	}
+	defer jsonFile.Close()
 
-	// Set the file name of the configurations file
-	viper.SetConfigName("config")
-
-	// Set the path to look for the configurations file
-	viper.AddConfigPath("./" + configDir + "/config")
-	viper.AddConfigPath(home + "/" + configDir + "/config")
-	viper.AddConfigPath("/etc/onos/config")
-	viper.AddConfigPath(".")
-
-	viper.SetConfigType("json")
-
-	if err := viper.ReadInConfig(); err != nil {
-		return nil
-	}
-
-	err = viper.Unmarshal(config)
+	byteValue, err := ioutil.ReadAll(jsonFile)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+
+	return byteValue, nil
+
 }

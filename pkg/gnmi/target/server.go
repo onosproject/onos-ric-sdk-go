@@ -18,14 +18,11 @@ var log = logging.GetLogger("gnmi", "target")
 
 // NewService creates a new gnmi service
 func NewService(info ModelInfo) GnmiService {
-	cfg := Config{}
-	if err := load(&cfg); err != nil {
-		log.Errorf(err.Error())
+	byteValue, err := load()
+	if err != nil {
+		log.Error("Failed to read initial config", err)
 	}
-
-	log.Info("config:", cfg)
-
-	return newService(GetModel(info), nil, nil)
+	return newService(GetModel(info), byteValue, nil)
 }
 
 type GnmiService interface {
@@ -36,7 +33,7 @@ type GnmiService interface {
 func newService(model *Model, config []byte, callback ConfigCallback) GnmiService {
 	rootStruct, err := model.NewConfigStruct(config)
 	if err != nil {
-		log.Errorf("initial config cannot be initialized", config)
+		log.Errorf("initial config cannot be initialized", err)
 	}
 	server := &Server{
 		model:        model,

@@ -60,7 +60,6 @@ func (c *Config) Watch(ctx context.Context, req WatchRequest, ch chan<- Event) e
 		for update := range updateChannel {
 			for _, updatedPath := range pbPathList {
 				if update.Path.String() == updatedPath.String() {
-					log.Infof("Send update", updatedPath.String(), update.Path.String())
 					ch <- Event{}
 				}
 			}
