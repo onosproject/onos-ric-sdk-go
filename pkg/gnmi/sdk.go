@@ -13,18 +13,12 @@ import (
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 
-	"github.com/onosproject/onos-ric-sdk-go/pkg/gnmi/target"
 	pb "github.com/openconfig/gnmi/proto/gnmi"
 )
 
 var log = logging.GetLogger("sdk", "gnmi")
 
 var _ Configurable = &Config{}
-
-type Config struct {
-	server    *target.Server
-	ModelInfo target.ModelInfo
-}
 
 type WatchRequest struct {
 	Paths []path.Path
@@ -41,37 +35,11 @@ type GetResponse struct {
 type Event struct {
 }
 
-func RegisterConfigurable(c *Config) target.GnmiService {
-	service := target.NewService(c.ModelInfo)
-	c.server = service.GetServer()
-
-	return service
-}
-
-// Watch watches configuration changes
-func (c *Config) Watch(ctx context.Context, req WatchRequest, ch chan<- Event) error {
-	updateChannel := make(chan *pb.Update)
-	pbPathList, err := path.ParsePaths(req.Paths)
-	if err != nil {
-		return err
-	}
-	go c.server.WatchConfigUpdates(updateChannel)
-	go func() {
-		for update := range updateChannel {
-			for _, updatedPath := range pbPathList {
-				if update.Path.String() == updatedPath.String() {
-					ch <- Event{}
-				}
-			}
-		}
-	}()
-	return nil
-
-}
-
 // Get returns configuration values based on a given a set of paths
-func (c *Config) Get(ctx context.Context, req GetRequest) (GetResponse, error) {
+func (c *Config) Get(req GetRequest) (GetResponse, error) {
 	log.Infof("Received Get operation request on paths: %v", req.Paths)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	encoding, ok := pb.Encoding_value["JSON_IETF"]
 	if !ok {
 		return GetResponse{}, nil
@@ -114,7 +82,5 @@ func (c *Config) Get(ctx context.Context, req GetRequest) (GetResponse, error) {
 // Configurable
 type Configurable interface {
 	// Get gets a configuration value based on a given path
-	Get(ctx context.Context, req GetRequest) (GetResponse, error)
-	// Watch watches configuration changes
-	Watch(ctx context.Context, req WatchRequest, ch chan<- Event) error
+	Get(req GetRequest) (GetResponse, error)
 }
