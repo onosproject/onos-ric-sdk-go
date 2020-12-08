@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package config
+package target
 
 import (
 	"github.com/mitchellh/go-homedir"
@@ -22,7 +22,7 @@ func load(config *Config) error {
 	}
 
 	// Set the file name of the configurations file
-	viper.SetConfigName("gnmi")
+	viper.SetConfigName("config")
 
 	// Set the path to look for the configurations file
 	viper.AddConfigPath("./" + configDir + "/config")
@@ -30,7 +30,7 @@ func load(config *Config) error {
 	viper.AddConfigPath("/etc/onos/config")
 	viper.AddConfigPath(".")
 
-	viper.SetConfigType("yaml")
+	viper.SetConfigType("json")
 
 	if err := viper.ReadInConfig(); err != nil {
 		return nil

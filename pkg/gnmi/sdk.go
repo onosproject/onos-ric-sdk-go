@@ -17,7 +17,7 @@ import (
 	pb "github.com/openconfig/gnmi/proto/gnmi"
 )
 
-var log = logging.GetLogger("gnmi", "sdk")
+var log = logging.GetLogger("sdk", "gnmi")
 
 var _ Configurable = &Config{}
 
