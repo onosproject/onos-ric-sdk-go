@@ -16,7 +16,7 @@ import (
 	subtaskapi "github.com/onosproject/onos-api/go/onos/e2sub/task"
 	e2tapi "github.com/onosproject/onos-api/go/onos/e2t/e2"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
-	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/app"
+	"github.com/onosproject/onos-ric-sdk-go/pkg/app"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/connection"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/endpoint"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/indication"
