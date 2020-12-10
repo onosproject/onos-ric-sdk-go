@@ -22,17 +22,13 @@ github.com/eapache/queue
 github.com/ericchiang/oidc
 # github.com/fsnotify/fsnotify v1.4.9
 github.com/fsnotify/fsnotify
-# github.com/goccmack/goutil v1.2.1
-## explicit
 # github.com/gogo/protobuf v1.3.1
-## explicit
 github.com/gogo/protobuf/gogoproto
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 github.com/gogo/protobuf/sortkeys
 github.com/gogo/protobuf/types
 # github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
-## explicit
 github.com/golang/glog
 # github.com/golang/protobuf v1.4.3
 github.com/golang/protobuf/proto
@@ -88,7 +84,6 @@ github.com/kylelemons/godebug/pretty
 # github.com/magiconair/properties v1.8.4
 github.com/magiconair/properties
 # github.com/mitchellh/go-homedir v1.1.0
-## explicit
 github.com/mitchellh/go-homedir
 # github.com/mitchellh/mapstructure v1.3.3
 github.com/mitchellh/mapstructure
@@ -96,7 +91,7 @@ github.com/mitchellh/mapstructure
 ## explicit
 github.com/onosproject/config-models/modelplugin/ric-1.0.0/modelplugin
 github.com/onosproject/config-models/modelplugin/ric-1.0.0/ric_1_0_0
-# github.com/onosproject/onos-api/go v0.6.10-0.20201210173248-beef67ac7228
+# github.com/onosproject/onos-api/go v0.6.10
 ## explicit
 github.com/onosproject/onos-api/go/onos/config
 github.com/onosproject/onos-api/go/onos/config/change
@@ -139,8 +134,6 @@ github.com/pelletier/go-toml
 # github.com/pierrec/lz4 v2.6.0+incompatible
 github.com/pierrec/lz4
 github.com/pierrec/lz4/internal/xxh32
-# github.com/pkg/errors v0.9.1
-## explicit
 # github.com/pquerna/cachecontrol v0.0.0-20180517163645-1555304b9b35
 github.com/pquerna/cachecontrol
 github.com/pquerna/cachecontrol/cacheobject
@@ -154,10 +147,8 @@ github.com/spf13/cast
 # github.com/spf13/jwalterweatherman v1.1.0
 github.com/spf13/jwalterweatherman
 # github.com/spf13/pflag v1.0.5
-## explicit
 github.com/spf13/pflag
 # github.com/spf13/viper v1.7.1
-## explicit
 github.com/spf13/viper
 # github.com/subosito/gotenv v1.2.0
 github.com/subosito/gotenv
@@ -365,7 +356,6 @@ gopkg.in/square/go-jose.v2
 gopkg.in/square/go-jose.v2/cipher
 gopkg.in/square/go-jose.v2/json
 # gopkg.in/yaml.v2 v2.3.0
-## explicit
 gopkg.in/yaml.v2
 # honnef.co/go/tools v0.0.1-2019.2.3
 honnef.co/go/tools/arg
