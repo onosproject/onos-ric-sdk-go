@@ -11,7 +11,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201206002829-0f3b7ebb025b
-	github.com/onosproject/onos-api/go v0.6.10-0.20201210005922-7f9ea01e76d6
+	github.com/onosproject/onos-api/go v0.6.10-0.20201210173248-beef67ac7228
 	github.com/onosproject/onos-lib-go v0.6.25
 	github.com/openconfig/gnmi v0.0.0-20200617225440-d2b4e6a45802
 	github.com/openconfig/goyang v0.2.1

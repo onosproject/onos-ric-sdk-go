@@ -63,7 +63,7 @@ func (c ServiceConfig) GetPort() int {
 // Client is an E2 client
 type Client interface {
 	// Subscribe subscribes the client to indications
-	Subscribe(ctx context.Context, sub subapi.Subscription, ch chan<- indication.Indication) error
+	Subscribe(ctx context.Context, details subapi.SubscriptionDetails, ch chan<- indication.Indication) error
 }
 
 // NewClient creates a new E2 client
@@ -92,18 +92,21 @@ type e2Client struct {
 	conns      *connection.Manager
 }
 
-func (c *e2Client) Subscribe(ctx context.Context, sub subapi.Subscription, ch chan<- indication.Indication) error {
+func (c *e2Client) Subscribe(ctx context.Context, details subapi.SubscriptionDetails, ch chan<- indication.Indication) error {
 	id, err := uuid.NewUUID()
 	if err != nil {
 		return err
 	}
 
-	sub.ID = subapi.ID(id.String())
-	sub.AppID = subapi.AppID(c.config.AppID)
+	sub := &subapi.Subscription{
+		ID:      subapi.ID(id.String()),
+		AppID:   subapi.AppID(c.config.AppID),
+		Details: &details,
+	}
 
 	client := &subscriptionClient{
 		e2Client: c,
-		sub:      &sub,
+		sub:      sub,
 		ch:       ch,
 		ctx:      ctx,
 	}
