@@ -6,6 +6,7 @@
 package topo
 
 import (
+	"context"
 	topoapi "github.com/onosproject/onos-api/go/onos/topo"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/southbound"
@@ -47,7 +48,7 @@ func (c ServiceConfig) GetPort() int {
 // Client is a topo client
 type Client interface {
 	// Watch provides a simple facility for the application to watch for changes in the topology
-	Watch(ch chan<- topoapi.Event, options ...FilterOption) error
+	Watch(ctx context.Context, ch chan<- topoapi.Event, options ...FilterOption) error
 }
 
 const defaultServiceHost = "onos-topo"

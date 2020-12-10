@@ -22,9 +22,9 @@ import (
     //  - entities only (not relations)
     //  - entities of kind "eNB" only
     //  - existing entities or entities being added
-    err = client.Watch(ch,
-            TypeFilter(topoapi.Object_ENTITY), KindFilter("eNB"),
-            EventFilter(topoapi.EventType_NONE, topoapi.EventType_ADDED))
+    err = client.Watch(context.Background(), ch,
+            WithTypeFilter(topoapi.Object_ENTITY), WithKindFilter("eNB"),
+            WithEventFilter(topoapi.EventType_NONE, topoapi.EventType_ADDED))
     ...
     
     // Read from the channel; likely in a go routine

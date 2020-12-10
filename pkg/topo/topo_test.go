@@ -5,6 +5,7 @@
 package topo
 
 import (
+	"context"
 	"github.com/golang/mock/gomock"
 	topoapi "github.com/onosproject/onos-api/go/onos/topo"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
@@ -42,9 +43,9 @@ func TestTopoWatch(t *testing.T) {
 	client := testClient(mockClient)
 
 	ch := make(chan topoapi.Event)
-	err := client.Watch(ch,
-		TypeFilter(topoapi.Object_ENTITY), KindFilter("eNB"),
-		EventFilter(topoapi.EventType_NONE, topoapi.EventType_ADDED))
+	err := client.Watch(context.TODO(), ch,
+		WithTypeFilter(topoapi.Object_ENTITY), WithKindFilter("eNB"),
+		WithEventFilter(topoapi.EventType_NONE, topoapi.EventType_ADDED))
 	assert.NoError(t, err, "unable to start topology watch")
 
 	e := <- ch
@@ -64,7 +65,7 @@ func TestTopoWatchFail(t *testing.T) {
 
 	client := testClient(mockClient)
 	ch := make(chan topoapi.Event)
-	err := client.Watch(ch, TypeFilter(topoapi.Object_ENTITY), KindFilter("eNB"))
+	err := client.Watch(context.TODO(), ch, WithTypeFilter(topoapi.Object_ENTITY), WithKindFilter("eNB"))
 	assert.Error(t, err)
 }
 
@@ -87,7 +88,7 @@ func TestTopoWatchStreamFail(t *testing.T) {
 	client := testClient(mockClient)
 
 	ch := make(chan topoapi.Event)
-	err := client.Watch(ch, TypeFilter(topoapi.Object_ENTITY), KindFilter("eNB"))
+	err := client.Watch(context.TODO(), ch, WithTypeFilter(topoapi.Object_ENTITY), WithKindFilter("eNB"))
 	assert.NoError(t, err, "unable to start topology watch")
 
 	e := <- ch

@@ -27,8 +27,8 @@ func (f *eventFilterOption) matches(e topoapi.Event) bool {
 	return false
 }
 
-// EventFilter matches events of the specified event type
-func EventFilter(t ...topoapi.EventType) FilterOption {
+// WithEventFilter matches events of the specified event type
+func WithEventFilter(t ...topoapi.EventType) FilterOption {
 	return &eventFilterOption{
 		eventTypes: t,
 	}
@@ -47,8 +47,8 @@ func (f *typeFilterOption) matches(e topoapi.Event) bool {
 	return false
 }
 
-// TypeFilter matches events for objects of the specified type
-func TypeFilter(t ...topoapi.Object_Type) FilterOption {
+// WithTypeFilter matches events for objects of the specified type
+func WithTypeFilter(t ...topoapi.Object_Type) FilterOption {
 	return &typeFilterOption{
 		objectTypes: t,
 	}
@@ -58,8 +58,8 @@ type kindFilterOption struct {
 	kindIDs []topoapi.ID
 }
 
-// KindFilter matches events for objects of the specified kind
-func KindFilter(ids ...topoapi.ID) FilterOption {
+// WithKindFilter matches events for objects of the specified kind
+func WithKindFilter(ids ...topoapi.ID) FilterOption {
 	return &kindFilterOption{
 		kindIDs: ids,
 	}
