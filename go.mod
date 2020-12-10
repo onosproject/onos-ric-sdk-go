@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/goccmack/goutil v1.2.1 // indirect
-	github.com/gogo/protobuf v1.3.1
+	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/golang/mock v1.4.4
 	github.com/google/gnxi v0.0.0-20201130113533-3b2d93b83a53
