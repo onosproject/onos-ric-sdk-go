@@ -6,6 +6,7 @@ require (
 	github.com/goccmack/goutil v1.2.1 // indirect
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
+	github.com/golang/mock v1.4.4
 	github.com/google/gnxi v0.0.0-20201130113533-3b2d93b83a53
 	github.com/google/uuid v1.1.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0 // indirect

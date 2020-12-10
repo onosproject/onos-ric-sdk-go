@@ -56,5 +56,6 @@ func KindFilter(id topoapi.ID) FilterOption {
 }
 
 func (f *kindFilterOption) matches(e topoapi.Event) bool {
-	return f.kindID == e.Object.GetEntity().KindID
+	return e.Object.GetEntity() != nil && f.kindID == e.Object.GetEntity().KindID ||
+		e.Object.GetRelation() != nil && f.kindID == e.Object.GetRelation().KindID
 }

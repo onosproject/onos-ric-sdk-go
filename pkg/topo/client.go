@@ -62,14 +62,27 @@ var DefaultServiceConfig = ServiceConfig{
 
 // NewClient creates a new E2 client
 func NewClient(config ServiceConfig) (Client, error) {
+	grpcClient, err := newTopoClient(config)
+	if err != nil {
+		return nil, err
+	}
 	return &topoClient{
 		config: config,
+		client: grpcClient,
 	}, nil
+}
+
+func testClient(grpcClient topoapi.TopoClient) Client {
+	return &topoClient{
+		config: DefaultServiceConfig,
+		client: grpcClient,
+	}
 }
 
 // e2Client is the default E2 client implementation
 type topoClient struct {
 	config ServiceConfig
+	client topoapi.TopoClient
 }
 
 // newClient creates a new topo client
