@@ -51,6 +51,7 @@ func TestTopoWatch(t *testing.T) {
 	e = <- ch
 	assert.Equal(t, topoapi.ID("1"), e.Object.ID)
 	assert.Equal(t, topoapi.EventType_REMOVED, e.Type)
+	e = <- ch
 }
 
 // TODO: add negative tests
