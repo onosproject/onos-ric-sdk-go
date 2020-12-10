@@ -24,13 +24,17 @@ github.com/eapache/queue
 github.com/ericchiang/oidc
 # github.com/fsnotify/fsnotify v1.4.9
 github.com/fsnotify/fsnotify
+# github.com/goccmack/goutil v1.2.1
+## explicit
 # github.com/gogo/protobuf v1.3.1
+## explicit
 github.com/gogo/protobuf/gogoproto
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 github.com/gogo/protobuf/sortkeys
 github.com/gogo/protobuf/types
 # github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
+## explicit
 github.com/golang/glog
 # github.com/golang/mock v1.4.4
 ## explicit
@@ -106,6 +110,7 @@ github.com/onosproject/onos-api/go/onos/e2sub/endpoint
 github.com/onosproject/onos-api/go/onos/e2sub/subscription
 github.com/onosproject/onos-api/go/onos/e2sub/task
 github.com/onosproject/onos-api/go/onos/e2t/e2
+github.com/onosproject/onos-api/go/onos/topo
 # github.com/onosproject/onos-lib-go v0.6.25
 ## explicit
 github.com/onosproject/onos-lib-go/api/logging
@@ -157,8 +162,10 @@ github.com/spf13/cast
 # github.com/spf13/jwalterweatherman v1.1.0
 github.com/spf13/jwalterweatherman
 # github.com/spf13/pflag v1.0.5
+## explicit
 github.com/spf13/pflag
 # github.com/spf13/viper v1.7.1
+## explicit
 github.com/spf13/viper
 # github.com/stretchr/testify v1.6.1
 ## explicit
