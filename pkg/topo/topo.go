@@ -19,6 +19,41 @@ import (
 
 var log = logging.GetLogger("topo", "client")
 
+// FilterOptions describes the criteria for the type of topology entities and events that the application should be
+// notified about
+type FilterOption interface {
+	matches(e topoapi.Event) bool
+}
+
+type typeFilterOption struct {
+	objectType topoapi.Object_Type
+}
+
+func (f *typeFilterOption) matches(e topoapi.Event) bool {
+	return f.objectType == e.Object.Type
+}
+
+func TypeFilter(t topoapi.Object_Type) FilterOption {
+	return &typeFilterOption{
+		objectType: t,
+	}
+}
+
+type kindFilterOption struct {
+	kindID topoapi.ID
+}
+
+func KindFilter(id topoapi.ID) FilterOption {
+	return &kindFilterOption{
+		kindID: id,
+	}
+}
+
+func (f *kindFilterOption) matches(e topoapi.Event) bool {
+	return f.kindID == e.Object.GetEntity().KindID
+}
+
+
 // ServiceConfig is a topo service configuration
 type ServiceConfig struct {
 	// Host is the service host
@@ -40,6 +75,12 @@ func (c ServiceConfig) GetPort() int {
 	return c.Port
 }
 
+// Client is a topo client
+type Client interface {
+	// Watch provides a simple facility for the application to watch for changes in the topology
+	Watch(ch chan<- topoapi.Object, options ...FilterOption) error
+}
+
 const defaultServiceHost = "onos-topo"
 const defaultServicePort = 5150
 
@@ -53,19 +94,22 @@ func SetTopoClientConfig(cfg ServiceConfig) {
 	topoServiceConfig = cfg
 }
 
-// FilterOptions describes the criteria for the type of topology entities and events that the application should be
-// notified about
-type FilterOptions struct {
-	// Various filter criteria to be added here
+// NewClient creates a new E2 client
+func NewClient(config ServiceConfig) (Client, error) {
+	return &topoClient{
+		config: config,
+	}, nil
 }
 
-// FilterOption is a topology filter function
-type FilterOption func(*FilterOptions)
+// e2Client is the default E2 client implementation
+type topoClient struct {
+	config ServiceConfig
+}
 
-// Watch topology provides a simple facility for the application to watch for changes in the topology.
-func WatchTopology(ch chan<- topoapi.Object, options ...FilterOption) error {
+// Watch provides a simple facility for the application to watch for changes in the topology.
+func (c *topoClient) Watch(ch chan<- topoapi.Object, filter ...FilterOption) error {
 	// Establish connection to the topology service
-	client, err := newTopoClient(topoServiceConfig)
+	client, err := newTopoClient(c.config)
 	if err != nil {
 		defer close(ch)
 		return err
@@ -85,13 +129,13 @@ func WatchTopology(ch chan<- topoapi.Object, options ...FilterOption) error {
 
 	// Kick off a go routine that reads events from the topology watch stream and subjects them to additional
 	// client-side filter criteria; objects that pass the filter get put on the application provided channel.
-	go handleWatchStream(ch, stream, options...)
+	go handleWatchStream(ch, stream, filter...)
 	return nil
 }
 
 // handleWatchStream reads events from the topology watch stream and subjects them to additional
 // client-side filter criteria; objects that pass the filter get put on the application provided channel.
-func handleWatchStream(ch chan<- topoapi.Object, stream topoapi.Topo_WatchClient, options ...FilterOption) {
+func handleWatchStream(ch chan<- topoapi.Object, stream topoapi.Topo_WatchClient, filter ...FilterOption) {
 	defer close(ch)
 	for {
 		resp, err := stream.Recv()
@@ -108,10 +152,19 @@ func handleWatchStream(ch chan<- topoapi.Object, stream topoapi.Topo_WatchClient
 				}
 			}
 			log.Error("An error occurred in receiving Subscription changes", err)
-		} else {
+		} else if applyFilters(resp.Event, filter...) {
 			ch <- resp.Event.Object
 		}
 	}
+}
+
+func applyFilters(event topoapi.Event, filter ...FilterOption) bool {
+	for _, f := range filter {
+		if !f.matches(event) {
+			return false
+		}
+	}
+	return true
 }
 
 // newClient creates a new topo client
