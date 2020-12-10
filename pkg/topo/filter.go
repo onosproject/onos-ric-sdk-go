@@ -15,47 +15,63 @@ type FilterOption interface {
 }
 
 type eventFilterOption struct {
-	eventType topoapi.EventType
+	eventTypes []topoapi.EventType
 }
 
 func (f *eventFilterOption) matches(e topoapi.Event) bool {
-	return f.eventType == e.Type
+	for _, t := range f.eventTypes {
+		if t == e.Type {
+			return true
+		}
+	}
+	return false
 }
 
 // EventFilter matches events of the specified event type
-func EventFilter(t topoapi.EventType) FilterOption {
+func EventFilter(t ...topoapi.EventType) FilterOption {
 	return &eventFilterOption{
-		eventType: t,
+		eventTypes: t,
 	}
 }
 
 type typeFilterOption struct {
-	objectType topoapi.Object_Type
+	objectTypes []topoapi.Object_Type
 }
 
 func (f *typeFilterOption) matches(e topoapi.Event) bool {
-	return f.objectType == e.Object.Type
+	for _, t := range f.objectTypes {
+		if t == e.Object.Type {
+			return true
+		}
+	}
+	return false
 }
 
 // TypeFilter matches events for objects of the specified type
-func TypeFilter(t topoapi.Object_Type) FilterOption {
+func TypeFilter(t ...topoapi.Object_Type) FilterOption {
 	return &typeFilterOption{
-		objectType: t,
+		objectTypes: t,
 	}
 }
 
 type kindFilterOption struct {
-	kindID topoapi.ID
+	kindIDs []topoapi.ID
 }
 
 // KindFilter matches events for objects of the specified kind
-func KindFilter(id topoapi.ID) FilterOption {
+func KindFilter(ids ...topoapi.ID) FilterOption {
 	return &kindFilterOption{
-		kindID: id,
+		kindIDs: ids,
 	}
 }
 
 func (f *kindFilterOption) matches(e topoapi.Event) bool {
-	return e.Object.GetEntity() != nil && f.kindID == e.Object.GetEntity().KindID ||
-		e.Object.GetRelation() != nil && f.kindID == e.Object.GetRelation().KindID
+	for _, k := range f.kindIDs {
+		ok := e.Object.GetEntity() != nil && k == e.Object.GetEntity().KindID ||
+			e.Object.GetRelation() != nil && k == e.Object.GetRelation().KindID
+		if ok {
+			return true
+		}
+	}
+	return false
 }
