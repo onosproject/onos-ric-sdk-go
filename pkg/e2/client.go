@@ -62,8 +62,14 @@ func (c ServiceConfig) GetPort() int {
 
 // Client is an E2 client
 type Client interface {
-	// Subscribe subscribes the client to indications
-	Subscribe(ctx context.Context, details subapi.SubscriptionDetails, ch chan<- indication.Indication) error
+	// Subscribe creates a subscription from the given SubscriptionDetails
+	// The Subscribe method will block until the subscription is successfully registered.
+	// The context.Context represents the lifecycle of this initial subscription process.
+	// Once the subscription has been created and the method returns, indications will be written
+	// to the given channel.
+	// If the subscription is successful, a subscription.Context will be returned. The subscription
+	// context can be used to cancel the subscription by calling Close() on the subscription.Context.
+	Subscribe(ctx context.Context, details subapi.SubscriptionDetails, ch chan<- indication.Indication) (subscription.Context, error)
 }
 
 // NewClient creates a new E2 client
@@ -92,10 +98,10 @@ type e2Client struct {
 	conns      *connection.Manager
 }
 
-func (c *e2Client) Subscribe(ctx context.Context, details subapi.SubscriptionDetails, ch chan<- indication.Indication) error {
+func (c *e2Client) Subscribe(ctx context.Context, details subapi.SubscriptionDetails, ch chan<- indication.Indication) (subscription.Context, error) {
 	id, err := uuid.NewUUID()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	sub := &subapi.Subscription{
@@ -104,52 +110,109 @@ func (c *e2Client) Subscribe(ctx context.Context, details subapi.SubscriptionDet
 		Details: &details,
 	}
 
-	client := &subscriptionClient{
+	client := &subContext{
 		e2Client: c,
 		sub:      sub,
-		ch:       ch,
-		ctx:      ctx,
 	}
-	return client.subscribe()
+	err = client.subscribe(ctx, ch)
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
 }
 
-// subscriptionClient is a client for managing a subscription
-type subscriptionClient struct {
+// subContext is an implementation of subscription.Context for managing a subscription
+// The subscription context is responsible for creating the subscription, monitoring the task
+// service for changes, and initializing the subscription stream with the appropriate E2 termination
+// when the subscription is assigned by the subscription service.
+type subContext struct {
 	*e2Client
 	sub    *subapi.Subscription
-	ch     chan<- indication.Indication
-	ctx    context.Context
 	cancel context.CancelFunc
 }
 
-func (c *subscriptionClient) subscribe() error {
-	err := c.subClient.Add(c.ctx, c.sub)
+// subscribe activates the subscription context
+// The given context.Context is the context within which the subscription must be created,
+// not the lifetime of the subscription. If the subscription cannot be created within the
+// given context.Context, it will be deleted.
+// Once the subscription has been created, the client tracks assignment of the subscription
+// to E2 terminations by watching the subscription task service.
+func (c *subContext) subscribe(ctx context.Context, indCh chan<- indication.Indication) error {
+	// Add the subscription to the subscription service
+	err := c.subClient.Add(ctx, c.sub)
 	if err != nil {
 		return err
 	}
 
-	taskCh := make(chan subtaskapi.Event)
-	err = c.taskClient.Watch(c.ctx, taskCh, subscriptiontask.WithSubscriptionID(c.sub.ID))
+	// Watch the subscription task service to determine assignment of the subscription to E2 terminations
+	watchCh := make(chan subtaskapi.Event)
+	watchCtx, cancel := context.WithCancel(context.Background())
+	c.cancel = cancel
+	err = c.taskClient.Watch(watchCtx, watchCh, subscriptiontask.WithSubscriptionID(c.sub.ID))
 	if err != nil {
 		return err
 	}
-	go c.processEvents(taskCh)
+
+	// The subscription is considered activated, and task events are processed in a separate goroutine.
+	go c.processTaskEvents(watchCh, indCh)
 	return nil
 }
 
-func (c *subscriptionClient) processEvents(eventCh <-chan subtaskapi.Event) {
+// processTaskEvents processes changes to subscription tasks related to the subscription
+// When a task associated with this subscription is created, connect to the associated E2 termination
+// and open a stream for indications. When the task is reassigned to a new termination point, clean
+// up the prior stream and open a new stream to the new E2 termination point.
+func (c *subContext) processTaskEvents(eventCh <-chan subtaskapi.Event, indCh chan<- indication.Indication) {
+	// After the context is closed and the associated Watch call is canceled, the eventCh will be closed.
+	// The indications channel is closed to indicate the subscription has been cleaned up.
+	defer close(indCh)
+
+	var prevCancel context.CancelFunc
+	var prevEndpoint epapi.ID
 	for event := range eventCh {
+		// Only interested in tasks related to this subscription
+		if event.Task.SubscriptionID != c.sub.ID {
+			continue
+		}
+
+		// If the stream is already open for the associated E2 endpoint, skip the event
+		if event.Task.EndpointID == prevEndpoint {
+			continue
+		}
+
+		// If the task was assigned to a new endpoint, close the prior stream and open a new one.
+		// If the task was unassigned, close the prior stream and wait for a new event.
 		if event.Type == subtaskapi.EventType_NONE || event.Type == subtaskapi.EventType_CREATED {
-			err := c.stream(event.Task.EndpointID)
-			if err != nil {
-				log.Error(err)
+			if prevCancel != nil {
+				prevCancel()
+			}
+			ctx, cancel := context.WithCancel(context.Background())
+			go func(epID epapi.ID) {
+				defer cancel()
+				err := c.openStream(ctx, epID, indCh)
+				if err != nil {
+					log.Error(err)
+				}
+			}(event.Task.EndpointID)
+			prevEndpoint = event.Task.EndpointID
+			prevCancel = cancel
+		} else if event.Type == subtaskapi.EventType_REMOVED {
+			prevEndpoint = ""
+			if prevCancel != nil {
+				prevCancel()
+				prevCancel = nil
 			}
 		}
 	}
 }
 
-func (c *subscriptionClient) stream(epID epapi.ID) error {
-	response, err := c.epClient.Get(c.ctx, epID)
+// openStream opens a new stream to the given endpoint
+// The client will lookup the endpoint address via the E2T endpoint service. If a valid endpoint is found,
+// the client will connect to the E2 termination point and initialize the subscription stream with a StreamRequest.
+// The stream lifetime is controlled by the given context.Context. When the context is closed, the stream and any
+// associated state will be closed and cleaned up.
+func (c *subContext) openStream(ctx context.Context, epID epapi.ID, indCh chan<- indication.Indication) error {
+	response, err := c.epClient.Get(ctx, epID)
 	if err != nil {
 		return err
 	}
@@ -159,19 +222,12 @@ func (c *subscriptionClient) stream(epID epapi.ID) error {
 		return err
 	}
 
-	if c.cancel != nil {
-		c.cancel()
-	}
-
 	client := termination.NewClient(conn)
-	ctx, cancel := context.WithCancel(context.Background())
 	responseCh := make(chan e2tapi.StreamResponse)
 	requestCh, err := client.Stream(ctx, responseCh)
 	if err != nil {
-		cancel()
 		return err
 	}
-	c.cancel = cancel
 
 	requestCh <- e2tapi.StreamRequest{
 		AppID:          e2tapi.AppID(c.config.AppID),
@@ -179,16 +235,26 @@ func (c *subscriptionClient) stream(epID epapi.ID) error {
 		SubscriptionID: e2tapi.SubscriptionID(c.sub.ID),
 	}
 
-	go func() {
-		for response := range responseCh {
-			c.ch <- indication.Indication{
-				EncodingType: encoding.Type(response.Header.EncodingType),
-				Payload: indication.Payload{
-					Header:  response.Header.IndicationHeader,
-					Message: response.IndicationMessage,
-				},
-			}
+	for response := range responseCh {
+		indCh <- indication.Indication{
+			EncodingType: encoding.Type(response.Header.EncodingType),
+			Payload: indication.Payload{
+				Header:  response.Header.IndicationHeader,
+				Message: response.IndicationMessage,
+			},
 		}
-	}()
+	}
 	return nil
 }
+
+// Close closes the subscription context
+// When the subscription context is closed, any existing streams will be closed and the subscription will be
+// removed from the subscription service. Propagation of the subscription delete is asynchronous.
+func (c *subContext) Close() error {
+	if c.cancel != nil {
+		c.cancel()
+	}
+	return c.subClient.Remove(context.Background(), c.sub)
+}
+
+var _ subscription.Context = &subContext{}
