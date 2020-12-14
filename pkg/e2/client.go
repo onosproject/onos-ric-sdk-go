@@ -186,16 +186,16 @@ func (c *subContext) processTaskEvents(eventCh <-chan subtaskapi.Event, indCh ch
 			if prevCancel != nil {
 				prevCancel()
 			}
-			prevEndpoint = event.Task.EndpointID
 			ctx, cancel := context.WithCancel(context.Background())
-			prevCancel = cancel
-			go func() {
+			go func(epID epapi.ID) {
 				defer cancel()
-				err := c.openStream(ctx, event.Task.EndpointID, indCh)
+				err := c.openStream(ctx, epID, indCh)
 				if err != nil {
 					log.Error(err)
 				}
-			}()
+			}(event.Task.EndpointID)
+			prevEndpoint = event.Task.EndpointID
+			prevCancel = cancel
 		} else if event.Type == subtaskapi.EventType_REMOVED {
 			prevEndpoint = ""
 			if prevCancel != nil {
