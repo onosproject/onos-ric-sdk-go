@@ -188,6 +188,7 @@ func (c *subContext) processTaskEvents(eventCh <-chan subtaskapi.Event, indCh ch
 			}
 			prevEndpoint = event.Task.EndpointID
 			ctx, cancel := context.WithCancel(context.Background())
+			prevCancel = cancel
 			go func() {
 				defer cancel()
 				err := c.openStream(ctx, event.Task.EndpointID, indCh)
