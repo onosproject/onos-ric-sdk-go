@@ -167,9 +167,8 @@ func (c *subContext) processTaskEvents(eventCh <-chan subtaskapi.Event, indCh ch
 	// The indications channel is closed to indicate the subscription has been cleaned up.
 	defer close(indCh)
 
-	var ctx context.Context
-	var cancel context.CancelFunc
-	var currentEndpoint epapi.ID
+	var prevCancel context.CancelFunc
+	var prevEndpoint epapi.ID
 	for event := range eventCh {
 		// Only interested in tasks related to this subscription
 		if event.Task.SubscriptionID != c.sub.ID {
@@ -177,18 +176,18 @@ func (c *subContext) processTaskEvents(eventCh <-chan subtaskapi.Event, indCh ch
 		}
 
 		// If the stream is already open for the associated E2 endpoint, skip the event
-		if event.Task.EndpointID == currentEndpoint {
+		if event.Task.EndpointID == prevEndpoint {
 			continue
 		}
 
 		// If the task was assigned to a new endpoint, close the prior stream and open a new one.
 		// If the task was unassigned, close the prior stream and wait for a new event.
 		if event.Type == subtaskapi.EventType_NONE || event.Type == subtaskapi.EventType_CREATED {
-			if cancel != nil {
-				cancel()
+			if prevCancel != nil {
+				prevCancel()
 			}
-			currentEndpoint = event.Task.EndpointID
-			ctx, cancel = context.WithCancel(context.Background())
+			prevEndpoint = event.Task.EndpointID
+			ctx, cancel := context.WithCancel(context.Background())
 			go func() {
 				defer cancel()
 				err := c.openStream(ctx, event.Task.EndpointID, indCh)
@@ -197,10 +196,10 @@ func (c *subContext) processTaskEvents(eventCh <-chan subtaskapi.Event, indCh ch
 				}
 			}()
 		} else if event.Type == subtaskapi.EventType_REMOVED {
-			currentEndpoint = ""
-			if cancel != nil {
-				cancel()
-				cancel = nil
+			prevEndpoint = ""
+			if prevCancel != nil {
+				prevCancel()
+				prevCancel = nil
 			}
 		}
 	}
