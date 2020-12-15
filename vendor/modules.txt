@@ -100,7 +100,7 @@ github.com/mitchellh/mapstructure
 ## explicit
 github.com/onosproject/config-models/modelplugin/ric-1.0.0/modelplugin
 github.com/onosproject/config-models/modelplugin/ric-1.0.0/ric_1_0_0
-# github.com/onosproject/onos-api/go v0.6.10
+# github.com/onosproject/onos-api/go v0.7.0
 ## explicit
 github.com/onosproject/onos-api/go/onos/config
 github.com/onosproject/onos-api/go/onos/config/change
@@ -111,7 +111,7 @@ github.com/onosproject/onos-api/go/onos/e2sub/subscription
 github.com/onosproject/onos-api/go/onos/e2sub/task
 github.com/onosproject/onos-api/go/onos/e2t/e2
 github.com/onosproject/onos-api/go/onos/topo
-# github.com/onosproject/onos-lib-go v0.6.25
+# github.com/onosproject/onos-lib-go v0.7.0
 ## explicit
 github.com/onosproject/onos-lib-go/api/logging
 github.com/onosproject/onos-lib-go/pkg/auth
