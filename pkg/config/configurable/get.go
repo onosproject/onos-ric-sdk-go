@@ -26,12 +26,13 @@ func (c *Config) Get(req GetRequest) (GetResponse, error) {
 	log.Debugf("Get Callback is called for:%+v", req)
 	notifications := make([]*pb.Notification, len(req.Paths))
 
-	if req.Paths == nil && req.DataType != "" {
+	jsonType := "IETF"
 
-		jsonType := "IETF"
-		if req.EncodingType == pb.Encoding_JSON {
-			jsonType = "Internal"
-		}
+	if req.EncodingType == pb.Encoding_JSON {
+		jsonType = "Internal"
+	}
+
+	if req.Paths == nil && req.DataType != "" {
 		notifications := make([]*pb.Notification, 1)
 		path := pb.Path{}
 		// Gets the whole config data tree
@@ -151,12 +152,6 @@ func (c *Config) Get(req GetRequest) (GetResponse, error) {
 				Update:    []*pb.Update{update},
 			}
 			continue
-		}
-
-		jsonType := "IETF"
-
-		if req.EncodingType == pb.Encoding_JSON {
-			jsonType = "Internal"
 		}
 
 		var jsonTree map[string]interface{}
