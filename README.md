@@ -26,11 +26,11 @@ import "github.com/onosproject/onos-ric-sdk-go/pkg/e2"
 ...
 
 config := e2.Config{
-  AppID: "my-app",
-  InstanceID: "my-app-1",
-  SubscriptionService: e2.ServiceConfig{
-    Host: "onos-e2sub",
-  },
+    AppID: "my-app",
+    InstanceID: "my-app-1",
+    SubscriptionService: e2.ServiceConfig{
+        Host: "onos-e2sub",
+    },
 }
 
 client, err := e2.NewClient(config)
@@ -49,26 +49,26 @@ import "github.com/onosproject/onos-api/go/onos/e2sub/subscription"
 var eventTrigger []byte // Encode the service model specific event trigger
 
 details := subscription.SubscriptionDetails{
-  E2NodeID: subscription.E2NodeID(nodeID),
-  ServiceModel: subscription.ServiceModel{
-    ID: subscription.ServiceModelID("test"),
-  },
-  EventTrigger: subscription.EventTrigger{
-    Payload: subscription.Payload{
-      Encoding: subscription.Encoding_ENCODING_PROTO,
-      Data:     eventTrigger,
+    E2NodeID: subscription.E2NodeID(nodeID),
+    ServiceModel: subscription.ServiceModel{
+        ID: subscription.ServiceModelID("test"),
     },
-  },
-  Actions: []subscription.Action{
-    {
-      ID:   100,
-      Type: subscription.ActionType_ACTION_TYPE_REPORT,
-      SubsequentAction: &subscription.SubsequentAction{
-        Type:       subscription.SubsequentActionType_SUBSEQUENT_ACTION_TYPE_CONTINUE,
-        TimeToWait: subscription.TimeToWait_TIME_TO_WAIT_ZERO,
-      },
+    EventTrigger: subscription.EventTrigger{
+        Payload: subscription.Payload{
+            Encoding: subscription.Encoding_ENCODING_PROTO,
+            Data:     eventTrigger,
+        },
     },
-  },
+    Actions: []subscription.Action{
+        {
+            ID:   100,
+            Type: subscription.ActionType_ACTION_TYPE_REPORT,
+            SubsequentAction: &subscription.SubsequentAction{
+                Type:       subscription.SubsequentActionType_SUBSEQUENT_ACTION_TYPE_CONTINUE,
+                TimeToWait: subscription.TimeToWait_TIME_TO_WAIT_ZERO,
+            },
+        },
+    },
 }
 ```
 
@@ -83,7 +83,7 @@ ch := make(chan indication.Indication)
 _, err := client.Subscribe(context.TODO(), details, ch)
 
 for ind := range ch {
-  ...
+    ...
 }
 ```
 
