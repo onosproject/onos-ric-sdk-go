@@ -31,7 +31,7 @@ func (q *Query) GetJsonConfig() (string, error) {
 	return JsonConfig, nil
 }
 
-// GetJsonValue
+// GetJsonValue returns the config value based on a given key
 func (q *Query) GetJsonValue(key string) (interface{}, error) {
 	jsonConfig, err := q.GetJsonConfig()
 	if err != nil {

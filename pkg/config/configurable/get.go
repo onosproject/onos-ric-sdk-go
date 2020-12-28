@@ -21,7 +21,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// Get
+// Get gets config value
 func (c *Config) Get(req GetRequest) (GetResponse, error) {
 	log.Debugf("Get Callback is called for:%+v", req)
 	notifications := make([]*pb.Notification, len(req.Paths))

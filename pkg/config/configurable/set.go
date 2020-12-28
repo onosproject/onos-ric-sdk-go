@@ -151,7 +151,7 @@ func (c *Config) doReplaceOrUpdate(jsonTree map[string]interface{}, op pb.Update
 	}, nil
 }
 
-// Set
+// Set sets config value
 func (c *Config) Set(req SetRequest) (SetResponse, error) {
 	log.Debugf("Set Callback is called for:%+v", req)
 	jsonTree, err := ygot.ConstructIETFJSON(*c.config, &ygot.RFC7951JSONConfig{})
