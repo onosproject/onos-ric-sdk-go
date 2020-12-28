@@ -119,7 +119,6 @@ func (c *Config) Get(req GetRequest) (GetResponse, error) {
 				var err error
 				switch kind := reflect.ValueOf(node).Kind(); kind {
 				case reflect.Int64:
-					//fmt.Println(reflect.TypeOf(node[0].Data).Elem())
 					enumMap, ok := c.model.GetEnumData()[reflect.TypeOf(node).Name()]
 					if !ok {
 						return GetResponse{}, status.Error(codes.Internal, "not a GoStruct enumeration type")
