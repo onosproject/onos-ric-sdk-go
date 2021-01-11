@@ -41,7 +41,6 @@ func get(node interface{}, path interface{}) (interface{}, error) {
 		return nil, err
 	}
 	for _, key := range keys {
-		log.Info("Key test:", key)
 		node, err = search(node, key)
 		if err != nil {
 			log.Info(err)
