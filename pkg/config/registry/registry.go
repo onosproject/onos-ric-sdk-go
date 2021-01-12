@@ -29,6 +29,33 @@ type RegisterResponse struct {
 	Config *configurable.ConfigStore
 }
 
+func startAgent(c *RegisterRequest, ce configurable.Configurable) error {
+	s := northbound.NewServer(northbound.NewServerCfg(
+		"",
+		"",
+		"",
+		int16(gnmiAgentPort),
+		true,
+		northbound.SecurityConfig{}))
+
+	service := agent.NewService(ce)
+	s.AddService(service)
+
+	c.server = service.GetServer()
+
+	doneCh := make(chan error)
+	go func() {
+		err := s.Serve(func(started string) {
+			log.Info("Started gNMI Agent on port ", started)
+			close(doneCh)
+		})
+		if err != nil {
+			doneCh <- err
+		}
+	}()
+	return <-doneCh
+}
+
 func RegisterConfigurable(c *RegisterRequest) (RegisterResponse, error) {
 	initialConfig, err := load()
 	if err != nil {
@@ -45,33 +72,13 @@ func RegisterConfigurable(c *RegisterRequest) (RegisterResponse, error) {
 
 	configurableEntity := &configurable.Config{}
 	configurableEntity.InitConfig(config)
-
-	s := northbound.NewServer(northbound.NewServerCfg(
-		"",
-		"",
-		"",
-		int16(gnmiAgentPort),
-		true,
-		northbound.SecurityConfig{}))
-
-	service := agent.NewService(configurableEntity)
-	s.AddService(service)
-
-	c.server = service.GetServer()
+	err = startAgent(c, configurableEntity)
+	if err != nil {
+		return RegisterResponse{}, err
+	}
 	response := RegisterResponse{
 		Config: config,
 	}
 
-	doneCh := make(chan error)
-	go func() {
-		err := s.Serve(func(started string) {
-			log.Info("Started gNMI Agent on port ", started)
-			close(doneCh)
-		})
-		if err != nil {
-			doneCh <- err
-		}
-	}()
-
-	return response, <-doneCh
+	return response, nil
 }
