@@ -22,14 +22,13 @@ const (
 )
 
 type RegisterRequest struct {
-	server *agent.Server
 }
 
 type RegisterResponse struct {
 	Config *configurable.ConfigStore
 }
 
-func startAgent(c *RegisterRequest, ce configurable.Configurable) error {
+func startAgent(c configurable.Configurable) error {
 	s := northbound.NewServer(northbound.NewServerCfg(
 		"",
 		"",
@@ -38,10 +37,8 @@ func startAgent(c *RegisterRequest, ce configurable.Configurable) error {
 		true,
 		northbound.SecurityConfig{}))
 
-	service := agent.NewService(ce)
+	service := agent.NewService(c)
 	s.AddService(service)
-
-	c.server = service.GetServer()
 
 	doneCh := make(chan error)
 	go func() {
@@ -56,7 +53,7 @@ func startAgent(c *RegisterRequest, ce configurable.Configurable) error {
 	return <-doneCh
 }
 
-func RegisterConfigurable(c *RegisterRequest) (RegisterResponse, error) {
+func RegisterConfigurable(r *RegisterRequest) (RegisterResponse, error) {
 	initialConfig, err := load()
 	if err != nil {
 		log.Error("Failed to read initial config", err)
@@ -72,7 +69,7 @@ func RegisterConfigurable(c *RegisterRequest) (RegisterResponse, error) {
 
 	configurableEntity := &configurable.Config{}
 	configurableEntity.InitConfig(config)
-	err = startAgent(c, configurableEntity)
+	err = startAgent(configurableEntity)
 	if err != nil {
 		return RegisterResponse{}, err
 	}

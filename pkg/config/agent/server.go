@@ -23,7 +23,6 @@ func NewService(configurable configurable.Configurable) GnmiService {
 
 type GnmiService interface {
 	northbound.Service
-	GetServer() *Server
 }
 
 func newService(configurable configurable.Configurable) GnmiService {
@@ -39,10 +38,6 @@ func newService(configurable configurable.Configurable) GnmiService {
 // Service is a Service implementation for gnmi service.
 type Service struct {
 	server *Server
-}
-
-func (s *Service) GetServer() *Server {
-	return s.server
 }
 
 // Register registers the Service with the gRPC server.
