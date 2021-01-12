@@ -28,6 +28,7 @@ type RegisterResponse struct {
 	Config *configurable.ConfigStore
 }
 
+// startAgent stats gnmi agent server
 func startAgent(c configurable.Configurable) error {
 	s := northbound.NewServer(northbound.NewServerCfg(
 		"",
@@ -53,7 +54,8 @@ func startAgent(c configurable.Configurable) error {
 	return <-doneCh
 }
 
-func RegisterConfigurable(r *RegisterRequest) (RegisterResponse, error) {
+// RegisterConfigurable registers a configurable entity and starts a gNMI agent server
+func RegisterConfigurable(req *RegisterRequest) (RegisterResponse, error) {
 	initialConfig, err := load()
 	if err != nil {
 		log.Error("Failed to read initial config", err)
