@@ -7,6 +7,8 @@ package registry
 import (
 	"encoding/json"
 
+	"github.com/onosproject/onos-lib-go/pkg/northbound"
+
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/config/agent"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/config/configurable"
@@ -14,13 +16,17 @@ import (
 
 var log = logging.GetLogger("registry")
 
+const (
+	// IANA reserved port for gNMI
+	gnmiAgentPort = 9339
+)
+
 type RegisterRequest struct {
 	server *agent.Server
 }
 
 type RegisterResponse struct {
-	AgentService agent.GnmiService
-	Config       *configurable.ConfigStore
+	Config *configurable.ConfigStore
 }
 
 func RegisterConfigurable(c *RegisterRequest) (RegisterResponse, error) {
@@ -40,12 +46,32 @@ func RegisterConfigurable(c *RegisterRequest) (RegisterResponse, error) {
 	configurableEntity := &configurable.Config{}
 	configurableEntity.InitConfig(config)
 
+	s := northbound.NewServer(northbound.NewServerCfg(
+		"",
+		"",
+		"",
+		int16(gnmiAgentPort),
+		true,
+		northbound.SecurityConfig{}))
+
 	service := agent.NewService(configurableEntity)
+	s.AddService(service)
+
 	c.server = service.GetServer()
 	response := RegisterResponse{
-		AgentService: service,
-		Config:       config,
+		Config: config,
 	}
 
-	return response, nil
+	doneCh := make(chan error)
+	go func() {
+		err := s.Serve(func(started string) {
+			log.Info("Started gNMI Agent on port ", started)
+			close(doneCh)
+		})
+		if err != nil {
+			doneCh <- err
+		}
+	}()
+
+	return response, <-doneCh
 }
