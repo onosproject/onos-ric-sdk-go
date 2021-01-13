@@ -6,6 +6,7 @@ package configurable
 
 import (
 	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"github.com/onosproject/onos-ric-sdk-go/pkg/config/store"
 	"github.com/openconfig/gnmi/proto/gnmi"
 	pb "github.com/openconfig/gnmi/proto/gnmi"
 )
@@ -40,11 +41,11 @@ type SetResponse struct {
 
 // Config
 type Config struct {
-	config *ConfigStore
+	config *store.ConfigStore
 }
 
 //
-func (c *Config) InitConfig(config *ConfigStore) {
+func (c *Config) InitConfig(config *store.ConfigStore) {
 	c.config = config
 
 }

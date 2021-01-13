@@ -1,14 +1,19 @@
-// SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
-//
-// SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
+// SPDX-FileCopyrightText: ${year}-present Open Networking Foundation <info@opennetworking.org>
+// SPDX-License-Identifier: Apache-2.0
 
-package configurable
+package store
 
 import (
 	"context"
 
+	"github.com/onosproject/onos-ric-sdk-go/pkg/config/event"
+
+	"github.com/onosproject/onos-lib-go/pkg/logging"
+
 	"github.com/google/uuid"
 )
+
+var log = logging.GetLogger("config", "store")
 
 // Entry config entry
 type Entry struct {
@@ -18,11 +23,11 @@ type Entry struct {
 }
 
 type Store interface {
-	put(key string, entry Entry) error
+	Put(key string, entry Entry) error
 
 	Get(key string) (Entry, error)
 
-	Watch(ctx context.Context, ch chan Event) error
+	Watch(ctx context.Context, ch chan event.Event) error
 }
 
 type ConfigStore struct {
@@ -39,7 +44,7 @@ func NewConfigStore() *ConfigStore {
 	}
 }
 
-func (c *ConfigStore) Watch(ctx context.Context, ch chan Event) error {
+func (c *ConfigStore) Watch(ctx context.Context, ch chan event.Event) error {
 	c.eventBus.rm.Lock()
 	cw := ConfigTreeWatcher{
 		id: uuid.New(),
@@ -67,13 +72,13 @@ func (c *ConfigStore) Watch(ctx context.Context, ch chan Event) error {
 	return nil
 }
 
-func (c *ConfigStore) put(key string, entry Entry) error {
+func (c *ConfigStore) Put(key string, entry Entry) error {
 	err := put(c.ConfigTree, entry.Key, entry)
 	if err != nil {
 		return err
 	}
 
-	c.eventBus.send(Event{
+	c.eventBus.send(event.Event{
 		Key:       key,
 		Value:     entry,
 		EventType: entry.EventType,

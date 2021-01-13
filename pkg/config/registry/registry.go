@@ -7,6 +7,10 @@ package registry
 import (
 	"encoding/json"
 
+	"github.com/onosproject/onos-ric-sdk-go/pkg/config/app"
+
+	"github.com/onosproject/onos-ric-sdk-go/pkg/config/store"
+
 	"github.com/onosproject/onos-lib-go/pkg/northbound"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
@@ -25,7 +29,7 @@ type RegisterRequest struct {
 }
 
 type RegisterResponse struct {
-	Config *configurable.ConfigStore
+	Config *app.Config
 }
 
 // startAgent stats gnmi agent server
@@ -56,13 +60,13 @@ func startAgent(c configurable.Configurable) error {
 
 // RegisterConfigurable registers a configurable entity and starts a gNMI agent server
 func RegisterConfigurable(req *RegisterRequest) (RegisterResponse, error) {
-	initialConfig, err := load()
+	initialConfig, err := loadConfig()
 	if err != nil {
 		log.Error("Failed to read initial config", err)
 		return RegisterResponse{}, err
 	}
 
-	config := configurable.NewConfigStore()
+	config := store.NewConfigStore()
 	err = json.Unmarshal(initialConfig, &config.ConfigTree)
 	if err != nil {
 		log.Error("Failed to unmarshal initial config to json")
@@ -75,8 +79,11 @@ func RegisterConfigurable(req *RegisterRequest) (RegisterResponse, error) {
 	if err != nil {
 		return RegisterResponse{}, err
 	}
+
+	cfg := app.NewConfig(config)
+
 	response := RegisterResponse{
-		Config: config,
+		Config: cfg,
 	}
 
 	return response, nil

@@ -5,6 +5,7 @@
 package configurable
 
 import (
+	"github.com/onosproject/onos-ric-sdk-go/pkg/config/store"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/config/utils"
 	pb "github.com/openconfig/gnmi/proto/gnmi"
 )
@@ -16,12 +17,12 @@ func (c *Config) Set(req SetRequest) (SetResponse, error) {
 		fullPath := utils.GnmiFullPath(req.Prefix, upd.Path)
 		xpath := utils.ToXPath(fullPath)
 
-		entry := Entry{
+		entry := store.Entry{
 			Key:       xpath,
 			Value:     upd.GetVal(),
 			EventType: pb.UpdateResult_REPLACE.String(),
 		}
-		err := c.config.put(xpath, entry)
+		err := c.config.Put(xpath, entry)
 		if err != nil {
 			return SetResponse{}, err
 		}
@@ -36,12 +37,12 @@ func (c *Config) Set(req SetRequest) (SetResponse, error) {
 	for _, upd := range req.UpdatePaths {
 		fullPath := utils.GnmiFullPath(req.Prefix, upd.Path)
 		xpath := utils.ToXPath(fullPath)
-		entry := Entry{
+		entry := store.Entry{
 			Key:       xpath,
 			Value:     upd.GetVal(),
 			EventType: pb.UpdateResult_UPDATE.String(),
 		}
-		err := c.config.put(xpath, entry)
+		err := c.config.Put(xpath, entry)
 		if err != nil {
 			return SetResponse{}, err
 		}
