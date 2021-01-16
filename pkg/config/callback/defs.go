@@ -10,7 +10,7 @@ import (
 	"github.com/onosproject/onos-ric-sdk-go/pkg/config/store"
 )
 
-var log = logging.GetLogger("configurable")
+var log = logging.GetLogger("config", "callback")
 
 // Config
 type Config struct {
