@@ -110,8 +110,65 @@ err = sub.Close()
 The `Close()` method will return once the subscription has been removed from the E2 Subscription service. The indications channel will be closed once the subscription has been closed, so it's safe to read from the indications channel in an indefinite loop.
 
 ## O1 API
-...
+### Configuration of Applications
 
+Applications can be configured via [onos-config].  The µONOS RIC SDK provides a library that implements 
+gnmi agent and an interface between gnmi agent and an App. 
+gNMI agent is a simple and mostly stateless server to process gNMI requests from [onos-config] and 
+carry  state related to  connection and current conversation.
+Agent uses callback functions to push configuration data to the xApp and to retrieve requested 
+configuration data from the xApp. 
+
+#### Usage
+
+The following function call runs the gnmi agent server, initializes xApp configuration, 
+provides a pointer to the xApp config.
+
+```go
+import (
+      "github.com/onosproject/onos-ric-sdk-go/pkg/config/registry"
+)
+
+appConfig, err := registry.RegisterConfigurable(&registry.RegisterRequest{})
+```
+
+The application can access to its configuration as an interface{} as follows:
+
+```go
+config := appConfig.Config.Config()
+````
+
+An application can write its own utility functions to 
+convert its configuration to an appropriate format 
+(e.g. JSON), however the config SDK provides some utility functions that 
+allows an application to retrieve its configuration for a specific path 
+in the config tree or monitor configuration changes continually at runtime.
+For example, we can use the following function to retrieve the 
+configuration value for a specific config path in human readable format (e.g. /a/b/c),  
+
+```go
+value := appConfig.Config.Get("/a/b/c")
+```
+
+To monitor config changes at runtime in the xApp, it can write similar code
+as follows:
+
+```go
+import (
+	"github.com/onosproject/onos-ric-sdk-go/pkg/config/event"
+)
+
+ch := make(chan event.Event)
+ctx, cancel := context.WithCancel(context.Background())
+defer cancel()
+err := appConfig.Config.Watch(ctx, ch)
+
+for event := range ch {
+	// Process config events
+	...
+}
+
+````
 
 
 ## Watching Topology Changes
@@ -163,3 +220,4 @@ To narrow down the type of events to be received, the application can specify th
 
 [Go]: https://golang.org/
 [Go modules]: https://golang.org/ref/mod
+[onos-config]: https://github.com/onosproject/onos-config
