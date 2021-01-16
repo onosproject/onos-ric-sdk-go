@@ -5,13 +5,8 @@
 package configurable
 
 import (
-	"github.com/onosproject/onos-lib-go/pkg/logging"
-	"github.com/onosproject/onos-ric-sdk-go/pkg/config/store"
 	"github.com/openconfig/gnmi/proto/gnmi"
-	pb "github.com/openconfig/gnmi/proto/gnmi"
 )
-
-var log = logging.GetLogger("configurable")
 
 // GetRequest
 type GetRequest struct {
@@ -23,7 +18,7 @@ type GetRequest struct {
 
 // GetResponse
 type GetResponse struct {
-	Notifications []*pb.Notification
+	Notifications []*gnmi.Notification
 }
 
 // SetRequest
@@ -36,18 +31,7 @@ type SetRequest struct {
 
 // SetResponse
 type SetResponse struct {
-	Results []*pb.UpdateResult
-}
-
-// Config
-type Config struct {
-	config *store.ConfigStore
-}
-
-//
-func (c *Config) InitConfig(config *store.ConfigStore) {
-	c.config = config
-
+	Results []*gnmi.UpdateResult
 }
 
 // Configurable interface between gnmi agent and app
@@ -55,5 +39,3 @@ type Configurable interface {
 	Get(GetRequest) (GetResponse, error)
 	Set(SetRequest) (SetResponse, error)
 }
-
-var _ Configurable = &Config{}

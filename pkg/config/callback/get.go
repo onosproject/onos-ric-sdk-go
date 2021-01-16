@@ -2,11 +2,13 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package configurable
+package callback
 
 import (
 	"encoding/json"
 	"strings"
+
+	"github.com/onosproject/onos-ric-sdk-go/pkg/config/configurable"
 
 	"github.com/onosproject/onos-ric-sdk-go/pkg/config/utils"
 	pb "github.com/openconfig/gnmi/proto/gnmi"
@@ -24,7 +26,7 @@ func buildUpdate(b []byte, path *pb.Path, valType string) *pb.Update {
 	return update
 }
 
-func (c *Config) Get(req GetRequest) (GetResponse, error) {
+func (c *Config) Get(req configurable.GetRequest) (configurable.GetResponse, error) {
 	log.Debugf("Get Callback is called for:%+v", req)
 	notifications := make([]*pb.Notification, len(req.Paths))
 
@@ -33,12 +35,12 @@ func (c *Config) Get(req GetRequest) (GetResponse, error) {
 		xPath := utils.ToXPath(fullPath)
 		entry, err := c.config.Get(xPath)
 		if err != nil {
-			return GetResponse{}, err
+			return configurable.GetResponse{}, err
 		}
 
 		jsonDump, err := json.Marshal(entry.Value)
 		if err != nil {
-			return GetResponse{}, err
+			return configurable.GetResponse{}, err
 		}
 
 		update := buildUpdate(jsonDump, path, "IETF")
@@ -49,7 +51,7 @@ func (c *Config) Get(req GetRequest) (GetResponse, error) {
 
 	}
 
-	return GetResponse{
+	return configurable.GetResponse{
 		Notifications: notifications,
 	}, nil
 
