@@ -2,15 +2,16 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package configurable
+package callback
 
 import (
+	"github.com/onosproject/onos-ric-sdk-go/pkg/config/configurable"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/config/store"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/config/utils"
 	pb "github.com/openconfig/gnmi/proto/gnmi"
 )
 
-func (c *Config) Set(req SetRequest) (SetResponse, error) {
+func (c *Config) Set(req configurable.SetRequest) (configurable.SetResponse, error) {
 	log.Debugf("Set Callback is called for:%+v", req)
 	var results []*pb.UpdateResult
 	for _, upd := range req.ReplacePaths {
@@ -24,7 +25,7 @@ func (c *Config) Set(req SetRequest) (SetResponse, error) {
 		}
 		err := c.config.Put(xpath, entry)
 		if err != nil {
-			return SetResponse{}, err
+			return configurable.SetResponse{}, err
 		}
 
 		update := &pb.UpdateResult{
@@ -44,7 +45,7 @@ func (c *Config) Set(req SetRequest) (SetResponse, error) {
 		}
 		err := c.config.Put(xpath, entry)
 		if err != nil {
-			return SetResponse{}, err
+			return configurable.SetResponse{}, err
 		}
 
 		update := &pb.UpdateResult{
@@ -55,7 +56,7 @@ func (c *Config) Set(req SetRequest) (SetResponse, error) {
 
 	}
 
-	return SetResponse{
+	return configurable.SetResponse{
 		Results: results,
 	}, nil
 }

@@ -7,6 +7,9 @@ package registry
 import (
 	"encoding/json"
 
+	"github.com/onosproject/onos-ric-sdk-go/pkg/config/callback"
+	"github.com/onosproject/onos-ric-sdk-go/pkg/config/configurable"
+
 	"github.com/onosproject/onos-ric-sdk-go/pkg/config/app"
 
 	"github.com/onosproject/onos-ric-sdk-go/pkg/config/store"
@@ -15,7 +18,6 @@ import (
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/config/agent"
-	"github.com/onosproject/onos-ric-sdk-go/pkg/config/configurable"
 )
 
 var log = logging.GetLogger("registry")
@@ -73,7 +75,7 @@ func RegisterConfigurable(req *RegisterRequest) (RegisterResponse, error) {
 		return RegisterResponse{}, err
 	}
 
-	configurableEntity := &configurable.Config{}
+	configurableEntity := &callback.Config{}
 	configurableEntity.InitConfig(config)
 	err = startAgent(configurableEntity)
 	if err != nil {
