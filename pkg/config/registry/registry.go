@@ -7,10 +7,10 @@ package registry
 import (
 	"encoding/json"
 
+	_default "github.com/onosproject/onos-ric-sdk-go/pkg/config/app/default"
+
 	"github.com/onosproject/onos-ric-sdk-go/pkg/config/callback"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/config/configurable"
-
-	"github.com/onosproject/onos-ric-sdk-go/pkg/config/app"
 
 	"github.com/onosproject/onos-ric-sdk-go/pkg/config/store"
 
@@ -31,7 +31,7 @@ type RegisterRequest struct {
 }
 
 type RegisterResponse struct {
-	Config *app.Config
+	Config interface{}
 }
 
 // startAgent stats gnmi agent server
@@ -82,7 +82,7 @@ func RegisterConfigurable(req *RegisterRequest) (RegisterResponse, error) {
 		return RegisterResponse{}, err
 	}
 
-	cfg := app.NewConfig(config)
+	cfg := _default.NewConfig(config)
 
 	response := RegisterResponse{
 		Config: cfg,
