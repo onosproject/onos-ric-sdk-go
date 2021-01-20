@@ -57,7 +57,6 @@ func search(node interface{}, key interface{}) (interface{}, error) {
 			keys := key.(map[string]string)
 			array := node.([]interface{})
 			for k, v := range keys {
-
 				for index, value := range array {
 					switch vt := value.(type) {
 					case map[string]interface{}:
