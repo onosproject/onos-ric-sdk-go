@@ -27,8 +27,10 @@ type ConfigTreeWatcher struct {
 
 func (eb *EventBus) send(event event.Event) {
 	eb.rm.RLock()
-	for _, watcher := range eb.watchers {
-		watcher.ch <- event
-	}
+	go func() {
+		for _, watcher := range eb.watchers {
+			watcher.ch <- event
+		}
+	}()
 	eb.rm.RUnlock()
 }

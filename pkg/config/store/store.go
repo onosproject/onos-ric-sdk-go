@@ -74,14 +74,13 @@ func (c *ConfigStore) Watch(ctx context.Context, ch chan event.Event) error {
 }
 
 func (c *ConfigStore) Put(key string, entry Entry) error {
-	err := put(c.ConfigTree, entry.Key, entry)
+	err := put(c.ConfigTree, key, entry)
 	if err != nil {
 		return err
 	}
-
 	c.eventBus.send(event.Event{
 		Key:       key,
-		Value:     entry,
+		Value:     entry.Value,
 		EventType: entry.EventType,
 	})
 

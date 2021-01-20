@@ -6,14 +6,14 @@ package store
 
 import (
 	"strconv"
-	"strings"
-	"unicode/utf8"
+
+	"github.com/onosproject/onos-ric-sdk-go/pkg/config/utils"
 
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 )
 
 func put(node interface{}, path interface{}, entry Entry) error {
-	keys, err := breakdownPath(path)
+	keys, err := utils.ParseStringPath(path.(string))
 	if err != nil {
 		return err
 	}
@@ -28,15 +28,13 @@ func put(node interface{}, path interface{}, entry Entry) error {
 	switch node.(type) {
 	case map[string]interface{}:
 		node.(map[string]interface{})[lastKey.(string)] = entry.Value
-	default:
-
 	}
 
 	return nil
 }
 
 func get(node interface{}, path interface{}) (interface{}, error) {
-	keys, err := breakdownPath(path)
+	keys, err := utils.ParseStringPath(path.(string))
 	if err != nil {
 		return nil, err
 	}
@@ -50,47 +48,37 @@ func get(node interface{}, path interface{}) (interface{}, error) {
 
 	return node, nil
 }
-func trimFirstRune(s string) string {
-	_, i := utf8.DecodeRuneInString(s)
-	return s[i:]
-}
-
-func breakdownPath(path interface{}) ([]interface{}, error) {
-	var keys []interface{}
-	switch path := path.(type) {
-	case string:
-		names := strings.Split(trimFirstRune(path), "/")
-		keys = make([]interface{}, len(names))
-		for i, v := range names {
-			if n, err := strconv.Atoi(v); err == nil {
-				keys[i] = n
-			} else {
-				keys[i] = v
-			}
-		}
-	case []interface{}:
-		keys = path
-	default:
-		return nil, errors.New(errors.NotSupported, "path can only be of type string of []interface{}")
-	}
-	return keys, nil
-}
 
 func search(node interface{}, key interface{}) (interface{}, error) {
 	switch node.(type) {
 	case []interface{}:
-		// TODO in openconfig access to array is represented by name (e.g "/interfaces/interface[name=admin]/config/name")
-		//  rather than index (e.g xPath = "/interfaces/interface/0/config/name")
-		//  this part should be changed to support that.
-		idx, ok := key.(int)
-		if !ok {
-			return nil, errors.New(errors.Forbidden, "index is not an integer")
-		}
-		array := node.([]interface{})
-		if idx >= len(array) {
-			return nil, errors.New(errors.Forbidden, "index out of range")
-		} else {
-			node = array[idx]
+		switch key.(type) {
+		case map[string]string:
+			keys := key.(map[string]string)
+			array := node.([]interface{})
+			for k, v := range keys {
+				for index, value := range array {
+					switch vt := value.(type) {
+					case map[string]interface{}:
+						valueMap := value.(map[string]interface{})
+						switch valueMap[k].(type) {
+						case string:
+							if valueMap[k] == v {
+								node = array[index]
+							}
+						case float64:
+							floatValue, _ := strconv.ParseFloat(v, 64)
+							if valueMap[k].(float64) == floatValue {
+								node = array[index]
+							}
+						default:
+							return nil, errors.New(errors.NotSupported, "type %v is not supported", vt)
+
+						}
+
+					}
+				}
+			}
 		}
 	case map[string]interface{}:
 		key, ok := key.(string)
