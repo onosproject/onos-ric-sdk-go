@@ -131,6 +131,10 @@ type subContext struct {
 	cancel context.CancelFunc
 }
 
+func (s *subContext) ID() subapi.ID {
+	return s.sub.ID
+}
+
 // subscribe activates the subscription context
 // The given context.Context is the context within which the subscription must be created,
 // not the lifetime of the subscription. If the subscription cannot be created within the
