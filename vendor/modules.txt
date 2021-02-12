@@ -93,6 +93,8 @@ github.com/mitchellh/mapstructure
 # github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e
 ## explicit
 # github.com/onosproject/onos-api/go v0.7.5
+# github.com/onosproject/onos-api/go v0.7.3
+# github.com/onosproject/onos-api/go v0.7.0 => ../onos-api/go
 ## explicit
 github.com/onosproject/onos-api/go/onos/e2sub/endpoint
 github.com/onosproject/onos-api/go/onos/e2sub/subscription
@@ -114,6 +116,10 @@ github.com/onosproject/onos-lib-go/pkg/southbound
 ## explicit
 github.com/openconfig/gnmi/proto/gnmi
 github.com/openconfig/gnmi/proto/gnmi_ext
+# github.com/openconfig/goyang v0.2.1
+## explicit
+# github.com/openconfig/ygot v0.8.12
+## explicit
 # github.com/pelletier/go-toml v1.8.1
 ## explicit
 github.com/pelletier/go-toml
@@ -394,3 +400,4 @@ honnef.co/go/tools/staticcheck/vrp
 honnef.co/go/tools/stylecheck
 honnef.co/go/tools/unused
 honnef.co/go/tools/version
+# github.com/onosproject/onos-api/go => ../onos-api/go
