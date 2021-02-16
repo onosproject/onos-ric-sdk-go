@@ -30,7 +30,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.7.1 // indirect
 	github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201206002829-0f3b7ebb025b // indirect
-	github.com/onosproject/onos-api/go v0.7.0
+	github.com/onosproject/onos-api/go v0.7.4
 	github.com/onosproject/onos-lib-go v0.7.0
 	github.com/openconfig/gnmi v0.0.0-20200617225440-d2b4e6a45802
 	github.com/openconfig/goyang v0.2.1 // indirect
@@ -48,5 +48,3 @@ require (
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 )
-
-replace github.com/onosproject/onos-api/go => ../onos-api/go

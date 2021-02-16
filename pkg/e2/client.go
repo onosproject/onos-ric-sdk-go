@@ -85,6 +85,9 @@ func NewClient(config Config) (Client, error) {
 	uuid.SetNodeID([]byte(fmt.Sprintf("%s:%s", config.AppID, config.InstanceID)))
 	conns := connection.NewManager()
 	subConn, err := conns.Connect(fmt.Sprintf("%s:%d", config.SubscriptionService.GetHost(), config.SubscriptionService.GetPort()))
+	if err != nil {
+		return nil, err
+	}
 	e2tConn, err := conns.Connect(fmt.Sprintf("%s:%d", config.E2TService.GetHost(), config.E2TService.GetPort()))
 	if err != nil {
 		return nil, err

@@ -236,6 +236,12 @@ github.com/onosproject/onos-api/go v0.7.3 h1:ttIYZMylxcpmouFDdQDvb32BO/PlKXdKY2/
 github.com/onosproject/onos-api/go v0.7.3/go.mod h1:Has28v1hruZLUxY1E5cCZq76UHXJZLbh62h1W8KQztQ=
 github.com/onosproject/onos-api/go v0.7.5 h1:fCf5CEYVdfas79UraZP4oP8LrYctO2sLTz31PXEGsYU=
 github.com/onosproject/onos-api/go v0.7.5/go.mod h1:Has28v1hruZLUxY1E5cCZq76UHXJZLbh62h1W8KQztQ=
+github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201206002829-0f3b7ebb025b h1:/57YNgy/SYP9guyNVEJFehlE2Z3J5lMuJBDmmYavW3I=
+github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201206002829-0f3b7ebb025b/go.mod h1:S0h1CfyT3wxR8BYINzdnkqP80GfXB2YoL8X7ChvxPEU=
+github.com/onosproject/onos-api/go v0.7.0 h1:BjfN78bE/TXadUODrkYbaDsb1hyiV90dNiLoIkl5eV0=
+github.com/onosproject/onos-api/go v0.7.0/go.mod h1:HLfWE9aouIeOmi4soR6bxK2cZ33NbnFMvdyv9fmjaSg=
+github.com/onosproject/onos-api/go v0.7.4 h1:prmGyiWLr25bYQaTiEX8XbEAVpF6Gv+1gEKi447bdgE=
+github.com/onosproject/onos-api/go v0.7.4/go.mod h1:Has28v1hruZLUxY1E5cCZq76UHXJZLbh62h1W8KQztQ=
 github.com/onosproject/onos-lib-go v0.7.0 h1:+BxQc0K4nej8qsciArvk6QC3Do6VKQevbIegpR3Kil8=
 github.com/onosproject/onos-lib-go v0.7.0/go.mod h1:ttkK+fV2CULZFHiq6FBZ69i7/Nymi1Wow1DNy0Ik/2o=
 github.com/openconfig/gnmi v0.0.0-20200617225440-d2b4e6a45802 h1:WXFwJlWOJINlwlyAZuNo4GdYZS6qPX36+rRUncLmN8Q=
