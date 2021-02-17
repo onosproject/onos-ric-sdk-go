@@ -7,8 +7,8 @@ require (
 	github.com/golang/mock v1.4.4
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/golang/snappy v0.0.2 // indirect
-	github.com/google/go-cmp v0.5.3 // indirect
 	github.com/google/gnxi v0.0.0-20201130113533-3b2d93b83a53 // indirect
+	github.com/google/go-cmp v0.5.3 // indirect
 	github.com/google/uuid v1.1.2
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0 // indirect
@@ -19,8 +19,12 @@ require (
 	github.com/mitchellh/mapstructure v1.3.3 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/onosproject/onos-api/go v0.7.5
+	github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201206002829-0f3b7ebb025b // indirect
+	github.com/onosproject/onos-api/go v0.7.4
 	github.com/onosproject/onos-lib-go v0.7.0
 	github.com/openconfig/gnmi v0.0.0-20200617225440-d2b4e6a45802
+	github.com/openconfig/goyang v0.2.1 // indirect
+	github.com/openconfig/ygot v0.8.12 // indirect
 	github.com/pelletier/go-toml v1.8.1 // indirect
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
 	github.com/smartystreets/assertions v1.2.0 // indirect
@@ -29,12 +33,6 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.7.1 // indirect
-	github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201206002829-0f3b7ebb025b // indirect
-	github.com/onosproject/onos-api/go v0.7.4
-	github.com/onosproject/onos-lib-go v0.7.0
-	github.com/openconfig/gnmi v0.0.0-20200617225440-d2b4e6a45802
-	github.com/openconfig/goyang v0.2.1 // indirect
-	github.com/openconfig/ygot v0.8.12 // indirect
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b
 	golang.org/x/sys v0.0.0-20201113233024-12cec1faf1ba // indirect
