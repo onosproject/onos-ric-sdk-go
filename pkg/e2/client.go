@@ -7,8 +7,9 @@ package e2
 import (
 	"context"
 	"fmt"
-	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"sync"
+
+	"github.com/onosproject/onos-lib-go/pkg/errors"
 
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/encoding"
 
@@ -200,7 +201,7 @@ func (c *subContext) processTaskEvents(ctx context.Context, eventCh <-chan subta
 		}
 
 		// If the stream is already open for the associated E2 endpoint, skip the event
-		if event.Task.EndpointID == prevEndpoint {
+		if event.Task.EndpointID == prevEndpoint && event.Task.Lifecycle.Failure == nil {
 			continue
 		}
 
