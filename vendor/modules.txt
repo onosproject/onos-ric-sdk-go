@@ -43,8 +43,6 @@ github.com/golang/protobuf/ptypes/timestamp
 # github.com/golang/snappy v0.0.2
 ## explicit
 github.com/golang/snappy
-# github.com/google/gnxi v0.0.0-20201130113533-3b2d93b83a53
-## explicit
 # github.com/google/go-cmp v0.5.3
 ## explicit
 # github.com/google/uuid v1.1.2
@@ -94,14 +92,11 @@ github.com/mitchellh/go-homedir
 github.com/mitchellh/mapstructure
 # github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e
 ## explicit
-<<<<<<< HEAD
 # github.com/onosproject/onos-api/go v0.7.5
 # github.com/onosproject/onos-api/go v0.7.3
 # github.com/onosproject/onos-api/go v0.7.0 => ../onos-api/go
-=======
 # github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201206002829-0f3b7ebb025b
 ## explicit
->>>>>>> rebase
 # github.com/onosproject/onos-api/go v0.7.4
 ## explicit
 github.com/onosproject/onos-api/go/onos/e2sub/endpoint
@@ -124,10 +119,6 @@ github.com/onosproject/onos-lib-go/pkg/southbound
 ## explicit
 github.com/openconfig/gnmi/proto/gnmi
 github.com/openconfig/gnmi/proto/gnmi_ext
-# github.com/openconfig/goyang v0.2.1
-## explicit
-# github.com/openconfig/ygot v0.8.12
-## explicit
 # github.com/pelletier/go-toml v1.8.1
 ## explicit
 github.com/pelletier/go-toml

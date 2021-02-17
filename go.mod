@@ -7,7 +7,6 @@ require (
 	github.com/golang/mock v1.4.4
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/golang/snappy v0.0.2 // indirect
-	github.com/google/gnxi v0.0.0-20201130113533-3b2d93b83a53 // indirect
 	github.com/google/go-cmp v0.5.3 // indirect
 	github.com/google/uuid v1.1.2
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
@@ -23,8 +22,6 @@ require (
 	github.com/onosproject/onos-api/go v0.7.4
 	github.com/onosproject/onos-lib-go v0.7.0
 	github.com/openconfig/gnmi v0.0.0-20200617225440-d2b4e6a45802
-	github.com/openconfig/goyang v0.2.1 // indirect
-	github.com/openconfig/ygot v0.8.12 // indirect
 	github.com/pelletier/go-toml v1.8.1 // indirect
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
 	github.com/smartystreets/assertions v1.2.0 // indirect
