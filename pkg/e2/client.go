@@ -7,6 +7,7 @@ package e2
 import (
 	"context"
 	"fmt"
+	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"sync"
 
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/encoding"
@@ -114,6 +115,7 @@ func (c *e2Client) Subscribe(ctx context.Context, details subapi.SubscriptionDet
 	client := &subContext{
 		e2Client: c,
 		sub:      sub,
+		errCh:    make(chan error),
 	}
 	err = client.subscribe(ctx, ch)
 	if err != nil {
@@ -129,11 +131,16 @@ func (c *e2Client) Subscribe(ctx context.Context, details subapi.SubscriptionDet
 type subContext struct {
 	*e2Client
 	sub    *subapi.Subscription
+	errCh  chan error
 	cancel context.CancelFunc
 }
 
-func (s *subContext) ID() subapi.ID {
-	return s.sub.ID
+func (c *subContext) ID() subapi.ID {
+	return c.sub.ID
+}
+
+func (c *subContext) Err() <-chan error {
+	return c.errCh
 }
 
 // subscribe activates the subscription context
@@ -195,6 +202,11 @@ func (c *subContext) processTaskEvents(ctx context.Context, eventCh <-chan subta
 		// If the stream is already open for the associated E2 endpoint, skip the event
 		if event.Task.EndpointID == prevEndpoint {
 			continue
+		}
+
+		// If the task failed, propagate the error
+		if event.Task.Lifecycle.Failure != nil {
+			c.errCh <- errors.NewInternal(event.Task.Lifecycle.Failure.Message)
 		}
 
 		// If the task was assigned to a new endpoint, close the prior stream and open a new one.
