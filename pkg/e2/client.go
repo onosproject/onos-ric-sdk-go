@@ -271,7 +271,7 @@ func (c *subContext) openStream(ctx context.Context, epID epapi.ID, indCh chan<-
 		indCh <- indication.Indication{
 			EncodingType: encoding.Type(response.Header.EncodingType),
 			Payload: indication.Payload{
-				Header:  response.Header.IndicationHeader,
+				Header:  response.IndicationHeader,
 				Message: response.IndicationMessage,
 			},
 		}
