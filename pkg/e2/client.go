@@ -76,7 +76,7 @@ type Client interface {
 	// context can be used to cancel the subscription by calling Close() on the subscription.Context.
 	Subscribe(ctx context.Context, details subapi.SubscriptionDetails, ch chan<- indication.Indication) (subscription.Context, error)
 
-	// Control creates and sends a E2 control request.
+	// Control creates and sends a E2 control request and recevies a control response.
 	Control(ctx context.Context, request *e2tapi.ControlRequest) (*e2tapi.ControlResponse, error)
 }
 
