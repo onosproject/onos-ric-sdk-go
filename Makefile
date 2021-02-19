@@ -9,6 +9,10 @@ test: # @HELP run the unit tests and source code validation
 test: deps license_check linters
 	go test github.com/onosproject/onos-ric-sdk-go/pkg/...
 
+jenkins-test:  # @HELP run the unit tests and source code validation producing a junit style report for Jenkins
+jenkins-test: build-tools deps license_check linters
+	TEST_PACKAGES=github.com/onosproject/onos-ric-sdk-go/... ./../build-tools/build/jenkins/make-unit
+
 coverage: # @HELP generate unit test coverage data
 coverage: deps linters license_check
 	# ./build/bin/coveralls-coverage
