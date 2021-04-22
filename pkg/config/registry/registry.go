@@ -61,8 +61,8 @@ func startAgent(c configurable.Configurable) error {
 }
 
 // RegisterConfigurable registers a configurable entity and starts a gNMI agent server
-func RegisterConfigurable(req *RegisterRequest) (RegisterResponse, error) {
-	initialConfig, err := loadConfig()
+func RegisterConfigurable(jsonPath string, req *RegisterRequest) (RegisterResponse, error) {
+	initialConfig, err := loadConfig(jsonPath)
 	if err != nil {
 		log.Error("Failed to read initial config", err)
 		return RegisterResponse{}, err
