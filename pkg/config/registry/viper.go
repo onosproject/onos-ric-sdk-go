@@ -10,8 +10,9 @@ import (
 )
 
 // load loads the initial configuration
-func loadConfig() ([]byte, error) {
-	jsonFile, err := os.Open("/etc/onos/config/config.json")
+func loadConfig(jsonPath string) ([]byte, error) {
+	//jsonFile, err := os.Open("/etc/onos/config/config.json")
+	jsonFile, err := os.Open(jsonPath)
 	if err != nil {
 		return nil, err
 	}
