@@ -43,13 +43,6 @@ type ServiceConfig struct {
 	Host string
 	// Port is the service port
 	Port int
-
-	// CAPath is path to certificate authority key
-	CAPath string
-	// KeyPath is path to certificate cert key
-	KeyPath string
-	// CertPath is path to certificate server certificate
-	CertPath string
 	// Insecure indicates insecure connection
 	Insecure bool
 }
