@@ -7,6 +7,8 @@ package client
 import (
 	"context"
 
+	"github.com/onosproject/onos-ric-sdk-go/pkg/topo/options"
+
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 
 	"io"
@@ -33,13 +35,13 @@ type Client interface {
 	Get(ctx context.Context, id topoapi.ID) (*topoapi.Object, error)
 
 	// List lists R-NIB objects
-	List(ctx context.Context, filters *topoapi.Filters) ([]topoapi.Object, error)
+	List(ctx context.Context, opts ...options.ListOption) ([]topoapi.Object, error)
 
 	// Delete deletes an R-NIB object using the given ID
 	Delete(ctx context.Context, id topoapi.ID) error
 
 	// Watch watches topology events
-	Watch(ctx context.Context, ch chan<- topoapi.Event, filters *topoapi.Filters) error
+	Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...options.WatchOption) error
 }
 
 // NewClient creates a new E2 client
@@ -101,9 +103,13 @@ func (t *topoClient) Get(ctx context.Context, id topoapi.ID) (*topoapi.Object, e
 	return response.GetObject(), nil
 }
 
-func (t *topoClient) List(ctx context.Context, filters *topoapi.Filters) ([]topoapi.Object, error) {
+func (t *topoClient) List(ctx context.Context, opts ...options.ListOption) ([]topoapi.Object, error) {
+	listOptions := &options.ListOptions{}
+	for _, option := range opts {
+		option(listOptions)
+	}
 	response, err := t.client.List(ctx, &topoapi.ListRequest{
-		Filters: filters,
+		Filters: listOptions.GetFilters(),
 	})
 	if err != nil {
 		stat, ok := status.FromError(err)
@@ -132,9 +138,14 @@ func (t *topoClient) Delete(ctx context.Context, id topoapi.ID) error {
 
 }
 
-func (t *topoClient) Watch(ctx context.Context, ch chan<- topoapi.Event, filters *topoapi.Filters) error {
+func (t *topoClient) Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...options.WatchOption) error {
+	watchOptions := &options.WatchOptions{}
+	for _, option := range opts {
+		option(watchOptions)
+	}
+
 	req := topoapi.WatchRequest{
-		Filters: filters,
+		Filters: watchOptions.GetFilters(),
 	}
 	stream, err := t.client.Watch(ctx, &req)
 	if err != nil {

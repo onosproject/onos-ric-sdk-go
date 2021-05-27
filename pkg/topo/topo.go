@@ -8,6 +8,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/onosproject/onos-ric-sdk-go/pkg/topo/options"
+
 	"github.com/onosproject/onos-ric-sdk-go/pkg/utils/creds"
 	"google.golang.org/grpc/credentials"
 
@@ -69,10 +71,10 @@ type Client interface {
 	Get(ctx context.Context, id topoapi.ID) (*topoapi.Object, error)
 
 	// Watch provides a simple facility for the application to watch for changes in the topology
-	Watch(ctx context.Context, ch chan<- topoapi.Event, filters *topoapi.Filters) error
+	Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...options.WatchOption) error
 
 	// List of topo objects
-	List(ctx context.Context, filters *topoapi.Filters) ([]topoapi.Object, error)
+	List(ctx context.Context, opts ...options.ListOption) ([]topoapi.Object, error)
 }
 
 // NewClient creates a new E2 client
@@ -116,8 +118,8 @@ type topoClient struct {
 	client client.Client
 }
 
-func (t *topoClient) List(ctx context.Context, filters *topoapi.Filters) ([]topoapi.Object, error) {
-	return t.client.List(ctx, filters)
+func (t *topoClient) List(ctx context.Context, opts ...options.ListOption) ([]topoapi.Object, error) {
+	return t.client.List(ctx, opts...)
 
 }
 
@@ -125,6 +127,6 @@ func (t *topoClient) Get(ctx context.Context, id topoapi.ID) (*topoapi.Object, e
 	return t.client.Get(ctx, id)
 }
 
-func (t *topoClient) Watch(ctx context.Context, ch chan<- topoapi.Event, filters *topoapi.Filters) error {
-	return t.client.Watch(ctx, ch, filters)
+func (t *topoClient) Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...options.WatchOption) error {
+	return t.client.Watch(ctx, ch, opts...)
 }
