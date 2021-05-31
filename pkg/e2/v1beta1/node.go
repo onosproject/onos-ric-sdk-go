@@ -9,10 +9,10 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	e2api "github.com/onosproject/onos-api/go/onos/e2t/e2/v1beta1"
+	"github.com/onosproject/onos-lib-go/pkg/env"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"google.golang.org/grpc"
 	"io"
-	"os"
 	"sync"
 )
 
@@ -41,8 +41,8 @@ type Node interface {
 func NewNode(nodeID NodeID, opts ...Option) Node {
 	options := Options{
 		App: AppOptions{
-			AppID:      AppID(os.Getenv("SERVICE_NAME")),
-			InstanceID: InstanceID(os.Getenv("POD_NAME")),
+			AppID:      AppID(env.GetServiceName()),
+			InstanceID: InstanceID(env.GetPodName()),
 		},
 		Service: ServiceOptions{
 			Host: "onos-e2t",
