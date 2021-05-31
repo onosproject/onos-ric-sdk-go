@@ -10,6 +10,13 @@ import (
 
 const defaultServicePort = 5150
 
+type Encoding int
+
+const (
+	ProtoEncoding Encoding = iota
+	ASN1Encoding
+)
+
 // Option is an E2 client option
 type Option interface {
 	apply(*Options)
@@ -28,6 +35,8 @@ type Options struct {
 	ServiceModel ServiceModelOptions
 	// Service is the E2 termination service configuration
 	Service ServiceOptions
+	// Encoding is the default encoding
+	Encoding Encoding
 }
 
 // AppID is an application identifier
@@ -128,6 +137,23 @@ func WithServiceModel(name ServiceModelName, version ServiceModelVersion) Option
 			Version: version,
 		}
 	})
+}
+
+// WithEncoding sets the client encoding
+func WithEncoding(encoding Encoding) Option {
+	return newOption(func(options *Options) {
+		options.Encoding = encoding
+	})
+}
+
+// WithProtoEncoding sets the client encoding to ProtoEncoding
+func WithProtoEncoding() Option {
+	return WithEncoding(ProtoEncoding)
+}
+
+// WithASN1Encoding sets the client encoding to ASN1Encoding
+func WithASN1Encoding() Option {
+	return WithEncoding(ASN1Encoding)
 }
 
 // WithE2TAddress sets the address for the E2T service

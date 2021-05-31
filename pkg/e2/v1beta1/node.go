@@ -48,6 +48,7 @@ func NewNode(nodeID NodeID, opts ...Option) Node {
 			Host: "onos-e2t",
 			Port: defaultServicePort,
 		},
+		Encoding: ProtoEncoding,
 	}
 	for _, opt := range opts {
 		opt.apply(&options)
@@ -118,6 +119,7 @@ func (n *e2Node) Control(ctx context.Context, message *e2api.ControlMessage) (*e
 
 	request := &e2api.ControlRequest{
 		Headers: n.getRequestHeaders(),
+		Message: *message,
 	}
 	response, err := client.Control(ctx, request)
 	if err != nil {
