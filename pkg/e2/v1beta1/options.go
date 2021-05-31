@@ -102,7 +102,7 @@ func newOption(f func(*Options)) Option {
 // WithOptions sets the client options
 func WithOptions(opts Options) Option {
 	return newOption(func(options *Options) {
-		options = &opts
+		*options = opts
 	})
 }
 
