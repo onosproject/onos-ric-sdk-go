@@ -49,7 +49,7 @@ type Client interface {
 	List(ctx context.Context, opts ...options.Option) ([]topoapi.Object, error)
 }
 
-// NewClient creates a new E2 client
+// NewClient creates a new topo client
 func NewClient(opts ...options.Option) (Client, error) {
 
 	options := options.Options{
