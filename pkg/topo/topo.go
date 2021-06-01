@@ -71,10 +71,10 @@ type Client interface {
 	Get(ctx context.Context, id topoapi.ID) (*topoapi.Object, error)
 
 	// Watch provides a simple facility for the application to watch for changes in the topology
-	Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...options.WatchOption) error
+	Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...options.Option) error
 
 	// List of topo objects
-	List(ctx context.Context, opts ...options.ListOption) ([]topoapi.Object, error)
+	List(ctx context.Context, opts ...options.Option) ([]topoapi.Object, error)
 }
 
 // NewClient creates a new E2 client
@@ -118,8 +118,14 @@ type topoClient struct {
 	client client.Client
 }
 
-func (t *topoClient) List(ctx context.Context, opts ...options.ListOption) ([]topoapi.Object, error) {
-	return t.client.List(ctx, opts...)
+func (t *topoClient) List(ctx context.Context, opts ...options.Option) ([]topoapi.Object, error) {
+	options := options.Options{}
+
+	for _, opt := range opts {
+		opt.Apply(&options)
+	}
+
+	return t.client.List(ctx, options.List)
 
 }
 
@@ -127,6 +133,12 @@ func (t *topoClient) Get(ctx context.Context, id topoapi.ID) (*topoapi.Object, e
 	return t.client.Get(ctx, id)
 }
 
-func (t *topoClient) Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...options.WatchOption) error {
-	return t.client.Watch(ctx, ch, opts...)
+func (t *topoClient) Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...options.Option) error {
+	options := options.Options{}
+
+	for _, opt := range opts {
+		opt.Apply(&options)
+	}
+
+	return t.client.Watch(ctx, ch, options.Watch)
 }
