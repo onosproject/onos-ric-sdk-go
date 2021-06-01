@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	defaultServicePort = 5150
-	defaultServiceHost = "onos-topo"
+	DefaultServicePort = 5150
+	DefaultServiceHost = "onos-topo"
 )
 
 // Options topo SDK options
@@ -45,7 +45,7 @@ func (o ServiceOptions) GetHost() string {
 // GetPort gets the service port
 func (o ServiceOptions) GetPort() int {
 	if o.Port == 0 {
-		return defaultServicePort
+		return DefaultServicePort
 	}
 	return o.Port
 }

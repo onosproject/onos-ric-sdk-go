@@ -28,11 +28,6 @@ import (
 
 var log = logging.GetLogger("topo")
 
-const (
-	defaultServiceHost = "onos-topo"
-	defaultServicePort = 5150
-)
-
 // Client is a topo client
 type Client interface {
 
@@ -53,8 +48,8 @@ type Client interface {
 func NewClient(opts ...options.Option) (Client, error) {
 	options := options.Options{
 		Service: options.ServiceOptions{
-			Host: defaultServiceHost,
-			Port: defaultServicePort,
+			Host: options.DefaultServiceHost,
+			Port: options.DefaultServicePort,
 		},
 	}
 
