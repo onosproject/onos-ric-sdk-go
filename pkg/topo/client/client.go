@@ -23,8 +23,8 @@ import (
 
 var log = logging.GetLogger("topo", "client")
 
-// Client is a topo client
-type Client interface {
+// Topo is a topo client interface
+type Topo interface {
 	// Create creates an R-NIB object
 	Create(ctx context.Context, object *topoapi.Object) error
 
@@ -45,7 +45,7 @@ type Client interface {
 }
 
 // NewClient creates a new E2 client
-func NewClient(conn *grpc.ClientConn) (Client, error) {
+func NewClient(conn *grpc.ClientConn) (Topo, error) {
 	cl := topoapi.NewTopoClient(conn)
 	return &topoClient{
 		client: cl,
@@ -174,4 +174,4 @@ func (t *topoClient) Watch(ctx context.Context, ch chan<- topoapi.Event, opts op
 
 }
 
-var _ Client = &topoClient{}
+var _ Topo = &topoClient{}

@@ -84,17 +84,17 @@ func NewClient(opts ...options.Option) (Client, error) {
 	}
 
 	return &topoClient{
-		client: cl,
+		topo: cl,
 	}, nil
 }
 
 // topoClient is the topo client implementation
 type topoClient struct {
-	client client.Client
+	topo client.Topo
 }
 
 func (t *topoClient) Update(ctx context.Context, object *topoapi.Object) error {
-	return t.client.Update(ctx, object)
+	return t.topo.Update(ctx, object)
 }
 
 func (t *topoClient) List(ctx context.Context, opts ...options.Option) ([]topoapi.Object, error) {
@@ -104,12 +104,12 @@ func (t *topoClient) List(ctx context.Context, opts ...options.Option) ([]topoap
 		opt.Apply(&options)
 	}
 
-	return t.client.List(ctx, options.List)
+	return t.topo.List(ctx, options.List)
 
 }
 
 func (t *topoClient) Get(ctx context.Context, id topoapi.ID) (*topoapi.Object, error) {
-	return t.client.Get(ctx, id)
+	return t.topo.Get(ctx, id)
 }
 
 func (t *topoClient) Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...options.Option) error {
@@ -119,5 +119,5 @@ func (t *topoClient) Watch(ctx context.Context, ch chan<- topoapi.Event, opts ..
 		opt.Apply(&options)
 	}
 
-	return t.client.Watch(ctx, ch, options.Watch)
+	return t.topo.Watch(ctx, ch, options.Watch)
 }
