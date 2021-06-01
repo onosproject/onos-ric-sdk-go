@@ -51,7 +51,6 @@ type Client interface {
 
 // NewClient creates a new topo client
 func NewClient(opts ...options.Option) (Client, error) {
-
 	options := options.Options{
 		Service: options.ServiceOptions{
 			Host: defaultServiceHost,
