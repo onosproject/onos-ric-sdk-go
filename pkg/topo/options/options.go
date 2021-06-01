@@ -5,7 +5,14 @@
 package options
 
 import (
+	"fmt"
+
 	topoapi "github.com/onosproject/onos-api/go/onos/topo"
+)
+
+const (
+	defaultServicePort = 5150
+	defaultServiceHost = "onos-topo"
 )
 
 // Options topo SDK options
@@ -15,6 +22,42 @@ type Options struct {
 
 	// List list options
 	List ListOptions
+
+	// Service service options
+	Service ServiceOptions
+}
+
+// ServiceOptions are the options for a service
+type ServiceOptions struct {
+	// Host is the service host
+	Host string
+	// Port is the service port
+	Port int
+
+	Insecure bool
+}
+
+// GetHost gets the service host
+func (o ServiceOptions) GetHost() string {
+	return o.Host
+}
+
+// GetPort gets the service port
+func (o ServiceOptions) GetPort() int {
+	if o.Port == 0 {
+		return defaultServicePort
+	}
+	return o.Port
+}
+
+// IsInsecure is topo connection secure
+func (o ServiceOptions) IsInsecure() bool {
+	return o.Insecure
+}
+
+// GetAddress gets the service address
+func (o ServiceOptions) GetAddress() string {
+	return fmt.Sprintf("%s:%d", o.GetHost(), o.GetPort())
 }
 
 // Option topo client

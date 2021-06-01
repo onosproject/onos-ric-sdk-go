@@ -6,7 +6,6 @@ package topo
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/onosproject/onos-ric-sdk-go/pkg/topo/options"
 
@@ -34,37 +33,6 @@ const (
 	defaultServicePort = 5150
 )
 
-// Config topo client config
-type Config struct {
-	TopoService ServiceConfig
-}
-
-// ServiceConfig is a topo service configuration
-type ServiceConfig struct {
-	// Host is the service host
-	Host string
-	// Port is the service port
-	Port int
-	// Insecure indicates insecure connection
-	Insecure bool
-}
-
-// GetHost gets the service host
-func (c ServiceConfig) GetHost() string {
-	if c.Host == "" {
-		c.Host = defaultServiceHost
-	}
-	return c.Host
-}
-
-// GetPort gets the service port
-func (c ServiceConfig) GetPort() int {
-	if c.Port == 0 {
-		return defaultServicePort
-	}
-	return c.Port
-}
-
 // Client is a topo client
 type Client interface {
 
@@ -82,12 +50,24 @@ type Client interface {
 }
 
 // NewClient creates a new E2 client
-func NewClient(config Config) (Client, error) {
-	opts := []grpc.DialOption{
+func NewClient(opts ...options.Option) (Client, error) {
+
+	options := options.Options{
+		Service: options.ServiceOptions{
+			Host: defaultServiceHost,
+			Port: defaultServicePort,
+		},
+	}
+
+	for _, opt := range opts {
+		opt.Apply(&options)
+	}
+
+	dialOpts := []grpc.DialOption{
 		grpc.WithStreamInterceptor(southbound.RetryingStreamClientInterceptor(100 * time.Millisecond)),
 	}
-	if config.TopoService.Insecure {
-		opts = append(opts, grpc.WithInsecure())
+	if options.Service.Insecure {
+		dialOpts = append(dialOpts, grpc.WithInsecure())
 	} else {
 		tlsConfig, err := creds.GetClientCredentials()
 		if err != nil {
@@ -95,11 +75,10 @@ func NewClient(config Config) (Client, error) {
 			return nil, err
 		}
 
-		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
+		dialOpts = append(dialOpts, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
 	}
 	conns := connection.NewManager()
-	topoEndpointAddr := fmt.Sprintf("%s:%d", config.TopoService.GetHost(), config.TopoService.GetPort())
-	conn, err := conns.Connect(topoEndpointAddr, opts...)
+	conn, err := conns.Connect(options.Service.GetAddress(), dialOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -111,14 +90,12 @@ func NewClient(config Config) (Client, error) {
 	}
 
 	return &topoClient{
-		config: config,
 		client: cl,
 	}, nil
 }
 
 // topoClient is the topo client implementation
 type topoClient struct {
-	config Config
 	client client.Client
 }
 
