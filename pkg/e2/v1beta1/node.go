@@ -31,7 +31,7 @@ type Node interface {
 	// to the given channel.
 	// If the subscription is successful, a subscription.Context will be returned. The subscription
 	// context can be used to cancel the subscription by calling Close() on the subscription.Context.
-	Subscribe(ctx context.Context, sub *e2api.Subscription, indCh chan<- e2api.Indication, errCh chan<- error) error
+	Subscribe(ctx context.Context, sub *e2api.Subscription, indCh chan<- e2api.Indication) error
 
 	// Control creates and sends a E2 control message and awaits the outcome
 	Control(ctx context.Context, message *e2api.ControlMessage) (*e2api.ControlOutcome, error)
@@ -99,6 +99,13 @@ func (n *e2Node) connect(ctx context.Context) (*grpc.ClientConn, error) {
 }
 
 func (n *e2Node) getRequestHeaders() e2api.RequestHeaders {
+	var encoding e2api.Encoding
+	switch n.options.Encoding {
+	case ProtoEncoding:
+		encoding = e2api.Encoding_PROTO
+	case ASN1Encoding:
+		encoding = e2api.Encoding_ASN1_PER
+	}
 	return e2api.RequestHeaders{
 		AppID:      e2api.AppID(n.options.App.AppID),
 		InstanceID: e2api.InstanceID(n.options.App.InstanceID),
@@ -107,6 +114,7 @@ func (n *e2Node) getRequestHeaders() e2api.RequestHeaders {
 			Name:    e2api.ServiceModelName(n.options.ServiceModel.Name),
 			Version: e2api.ServiceModelVersion(n.options.ServiceModel.Version),
 		},
+		Encoding: encoding,
 	}
 }
 
@@ -128,7 +136,7 @@ func (n *e2Node) Control(ctx context.Context, message *e2api.ControlMessage) (*e
 	return &response.Outcome, nil
 }
 
-func (n *e2Node) Subscribe(ctx context.Context, sub *e2api.Subscription, indCh chan<- e2api.Indication, errCh chan<- error) error {
+func (n *e2Node) Subscribe(ctx context.Context, sub *e2api.Subscription, indCh chan<- e2api.Indication) error {
 	conn, err := n.connect(ctx)
 	if err != nil {
 		return err
@@ -142,14 +150,12 @@ func (n *e2Node) Subscribe(ctx context.Context, sub *e2api.Subscription, indCh c
 	stream, err := client.Subscribe(ctx, request)
 	if err != nil {
 		defer close(indCh)
-		defer close(errCh)
 		return errors.FromGRPC(err)
 	}
 
 	ackCh := make(chan error)
 	go func() {
 		defer close(indCh)
-		defer close(errCh)
 
 		acked := false
 		for {
@@ -168,8 +174,6 @@ func (n *e2Node) Subscribe(ctx context.Context, sub *e2api.Subscription, indCh c
 					ackCh <- err
 					close(ackCh)
 					break
-				} else {
-					errCh <- err
 				}
 			} else {
 				switch m := response.Message.(type) {
