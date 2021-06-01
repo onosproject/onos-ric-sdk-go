@@ -67,6 +67,10 @@ func (c ServiceConfig) GetPort() int {
 
 // Client is a topo client
 type Client interface {
+
+	// Update updates a topo object
+	Update(ctx context.Context, object *topoapi.Object) error
+
 	// Get gets a topo object with a given ID
 	Get(ctx context.Context, id topoapi.ID) (*topoapi.Object, error)
 
@@ -116,6 +120,10 @@ func NewClient(config Config) (Client, error) {
 type topoClient struct {
 	config Config
 	client client.Client
+}
+
+func (t *topoClient) Update(ctx context.Context, object *topoapi.Object) error {
+	return t.client.Update(ctx, object)
 }
 
 func (t *topoClient) List(ctx context.Context, opts ...options.Option) ([]topoapi.Object, error) {

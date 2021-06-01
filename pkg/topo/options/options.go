@@ -10,8 +10,10 @@ import (
 
 // Options topo SDK options
 type Options struct {
+	// Watch watch options
 	Watch WatchOptions
 
+	// List list options
 	List ListOptions
 }
 
