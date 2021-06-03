@@ -2,14 +2,10 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package client
+package topo
 
 import (
 	"context"
-
-	"github.com/onosproject/onos-ric-sdk-go/pkg/topo/options"
-
-	"github.com/onosproject/onos-lib-go/pkg/logging"
 
 	"io"
 
@@ -21,10 +17,9 @@ import (
 	"google.golang.org/grpc"
 )
 
-var log = logging.GetLogger("topo", "client")
+// TopoClient is a topo client interface
+type TopoClient interface {
 
-// Topo is a topo client interface
-type Topo interface {
 	// Create creates an R-NIB object
 	Create(ctx context.Context, object *topoapi.Object) error
 
@@ -35,17 +30,17 @@ type Topo interface {
 	Get(ctx context.Context, id topoapi.ID) (*topoapi.Object, error)
 
 	// List lists R-NIB objects
-	List(ctx context.Context, opts options.ListOptions) ([]topoapi.Object, error)
+	List(ctx context.Context, opts ...ListOption) ([]topoapi.Object, error)
 
 	// Delete deletes an R-NIB object using the given ID
 	Delete(ctx context.Context, id topoapi.ID) error
 
 	// Watch watches topology events
-	Watch(ctx context.Context, ch chan<- topoapi.Event, opts options.WatchOptions) error
+	Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...WatchOption) error
 }
 
-// NewClient creates a new E2 client
-func NewClient(conn *grpc.ClientConn) (Topo, error) {
+// NewTopoClient creates a new topo client
+func NewTopoClient(conn *grpc.ClientConn) (TopoClient, error) {
 	cl := topoapi.NewTopoClient(conn)
 	return &topoClient{
 		client: cl,
@@ -63,11 +58,7 @@ func (t *topoClient) Create(ctx context.Context, object *topoapi.Object) error {
 		Object: object,
 	})
 	if err != nil {
-		stat, ok := status.FromError(err)
-		if ok {
-			return errors.FromStatus(stat)
-		}
-		return err
+		return errors.FromGRPC(err)
 	}
 
 	return nil
@@ -78,11 +69,7 @@ func (t *topoClient) Update(ctx context.Context, object *topoapi.Object) error {
 		Object: object,
 	})
 	if err != nil {
-		stat, ok := status.FromError(err)
-		if ok {
-			return errors.FromStatus(stat)
-		}
-		return err
+		return errors.FromGRPC(err)
 	}
 
 	return nil
@@ -94,25 +81,23 @@ func (t *topoClient) Get(ctx context.Context, id topoapi.ID) (*topoapi.Object, e
 		ID: id,
 	})
 	if err != nil {
-		stat, ok := status.FromError(err)
-		if ok {
-			return nil, errors.FromStatus(stat)
-		}
-		return nil, err
+		return nil, errors.FromGRPC(err)
 	}
 	return response.GetObject(), nil
 }
 
-func (t *topoClient) List(ctx context.Context, opts options.ListOptions) ([]topoapi.Object, error) {
+func (t *topoClient) List(ctx context.Context, opts ...ListOption) ([]topoapi.Object, error) {
+	options := ListOptions{}
+
+	for _, opt := range opts {
+		opt.apply(&options)
+	}
+
 	response, err := t.client.List(ctx, &topoapi.ListRequest{
-		Filters: opts.GetFilters(),
+		Filters: options.GetFilters(),
 	})
 	if err != nil {
-		stat, ok := status.FromError(err)
-		if ok {
-			return nil, errors.FromStatus(stat)
-		}
-		return nil, err
+		return nil, errors.FromGRPC(err)
 	}
 
 	return response.GetObjects(), nil
@@ -124,28 +109,26 @@ func (t *topoClient) Delete(ctx context.Context, id topoapi.ID) error {
 		ID: id,
 	})
 	if err != nil {
-		stat, ok := status.FromError(err)
-		if ok {
-			return errors.FromStatus(stat)
-		}
-		return err
+		return errors.FromGRPC(err)
 	}
 	return nil
 
 }
 
-func (t *topoClient) Watch(ctx context.Context, ch chan<- topoapi.Event, opts options.WatchOptions) error {
+func (t *topoClient) Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...WatchOption) error {
+
+	options := WatchOptions{}
+	for _, opt := range opts {
+		opt.apply(&options)
+	}
+
 	req := topoapi.WatchRequest{
-		Filters: opts.GetFilters(),
+		Filters: options.GetFilters(),
 	}
 	stream, err := t.client.Watch(ctx, &req)
 	if err != nil {
 		defer close(ch)
-		stat, ok := status.FromError(err)
-		if ok {
-			return errors.FromStatus(stat)
-		}
-		return err
+		return errors.FromGRPC(err)
 	}
 
 	go func() {
@@ -174,4 +157,4 @@ func (t *topoClient) Watch(ctx context.Context, ch chan<- topoapi.Event, opts op
 
 }
 
-var _ Topo = &topoClient{}
+var _ TopoClient = &topoClient{}

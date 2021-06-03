@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package options
+package topo
 
 import (
 	"fmt"
@@ -17,12 +17,6 @@ const (
 
 // Options topo SDK options
 type Options struct {
-	// Watch watch options
-	Watch WatchOptions
-
-	// List list options
-	List ListOptions
-
 	// Service service options
 	Service ServiceOptions
 }
@@ -62,14 +56,14 @@ func (o ServiceOptions) GetAddress() string {
 
 // Option topo client
 type Option interface {
-	Apply(*Options)
+	apply(*Options)
 }
 
 type funcOption struct {
 	f func(*Options)
 }
 
-func (f funcOption) Apply(options *Options) {
+func (f funcOption) apply(options *Options) {
 	f.f(options)
 }
 
@@ -96,10 +90,29 @@ func (w WatchOptions) GetFilters() *topoapi.Filters {
 	return w.filters
 }
 
+// WatchOption topo client watch option
+type WatchOption interface {
+	apply(*WatchOptions)
+}
+
+type funcWatchOption struct {
+	f func(*WatchOptions)
+}
+
+func (f funcWatchOption) apply(options *WatchOptions) {
+	f.f(options)
+}
+
+func newWatchOption(f func(*WatchOptions)) WatchOption {
+	return funcWatchOption{
+		f: f,
+	}
+}
+
 // WithWatchFilters sets filters for watch method
-func WithWatchFilters(filters *topoapi.Filters) Option {
-	return newOption(func(o *Options) {
-		o.Watch.filters = filters
+func WithWatchFilters(filters *topoapi.Filters) WatchOption {
+	return newWatchOption(func(o *WatchOptions) {
+		o.filters = filters
 	})
 }
 
@@ -108,15 +121,34 @@ type ListOptions struct {
 	filters *topoapi.Filters
 }
 
+// ListOption topo client list option
+type ListOption interface {
+	apply(*ListOptions)
+}
+
+type funcListOption struct {
+	f func(options *ListOptions)
+}
+
+func (f funcListOption) apply(options *ListOptions) {
+	f.f(options)
+}
+
+func newListOption(f func(options *ListOptions)) ListOption {
+	return funcListOption{
+		f: f,
+	}
+}
+
 // GetFilters get filters
 func (l ListOptions) GetFilters() *topoapi.Filters {
 	return l.filters
 }
 
 // WithListFilters sets filters for list method
-func WithListFilters(filters *topoapi.Filters) Option {
-	return newOption(func(o *Options) {
-		o.List.filters = filters
+func WithListFilters(filters *topoapi.Filters) ListOption {
+	return newListOption(func(o *ListOptions) {
+		o.filters = filters
 	})
 
 }

@@ -7,8 +7,6 @@ package topo
 import (
 	"context"
 
-	"github.com/onosproject/onos-ric-sdk-go/pkg/topo/options"
-
 	"github.com/onosproject/onos-ric-sdk-go/pkg/utils/creds"
 	"google.golang.org/grpc/credentials"
 
@@ -18,8 +16,6 @@ import (
 
 	"time"
 
-	client "github.com/onosproject/onos-ric-sdk-go/pkg/topo/client"
-
 	"github.com/onosproject/onos-ric-sdk-go/pkg/topo/connection"
 
 	"github.com/onosproject/onos-lib-go/pkg/southbound"
@@ -28,7 +24,7 @@ import (
 
 var log = logging.GetLogger("topo")
 
-// Client is a topo client
+// Client is a topo SDK client
 type Client interface {
 
 	// Update updates a topo object
@@ -38,29 +34,30 @@ type Client interface {
 	Get(ctx context.Context, id topoapi.ID) (*topoapi.Object, error)
 
 	// Watch provides a simple facility for the application to watch for changes in the topology
-	Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...options.Option) error
+	Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...WatchOption) error
 
 	// List of topo objects
-	List(ctx context.Context, opts ...options.Option) ([]topoapi.Object, error)
+	List(ctx context.Context, opts ...ListOption) ([]topoapi.Object, error)
 }
 
 // NewClient creates a new topo client
-func NewClient(opts ...options.Option) (Client, error) {
-	options := options.Options{
-		Service: options.ServiceOptions{
-			Host: options.DefaultServiceHost,
-			Port: options.DefaultServicePort,
+func NewClient(opts ...Option) (Client, error) {
+	clientOptions := Options{
+		Service: ServiceOptions{
+			Host: DefaultServiceHost,
+			Port: DefaultServicePort,
 		},
 	}
 
 	for _, opt := range opts {
-		opt.Apply(&options)
+		opt.apply(&clientOptions)
 	}
 
 	dialOpts := []grpc.DialOption{
 		grpc.WithStreamInterceptor(southbound.RetryingStreamClientInterceptor(100 * time.Millisecond)),
+		grpc.WithUnaryInterceptor(southbound.RetryingUnaryClientInterceptor()),
 	}
-	if options.Service.Insecure {
+	if clientOptions.Service.Insecure {
 		dialOpts = append(dialOpts, grpc.WithInsecure())
 	} else {
 		tlsConfig, err := creds.GetClientCredentials()
@@ -72,52 +69,40 @@ func NewClient(opts ...options.Option) (Client, error) {
 		dialOpts = append(dialOpts, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
 	}
 	conns := connection.NewManager()
-	conn, err := conns.Connect(options.Service.GetAddress(), dialOpts...)
+	conn, err := conns.Connect(clientOptions.Service.GetAddress(), dialOpts...)
 	if err != nil {
 		return nil, err
 	}
 
-	cl, err := client.NewClient(conn)
+	topoClient, err := NewTopoClient(conn)
 	if err != nil {
 		log.Warn(err)
 		return nil, err
 	}
 
-	return &topoClient{
-		topo: cl,
+	return &topo{
+		topoClient: topoClient,
 	}, nil
 }
 
 // topoClient is the topo client implementation
-type topoClient struct {
-	topo client.Topo
+type topo struct {
+	topoClient TopoClient
 }
 
-func (t *topoClient) Update(ctx context.Context, object *topoapi.Object) error {
-	return t.topo.Update(ctx, object)
+func (t *topo) Update(ctx context.Context, object *topoapi.Object) error {
+	return t.topoClient.Update(ctx, object)
 }
 
-func (t *topoClient) List(ctx context.Context, opts ...options.Option) ([]topoapi.Object, error) {
-	options := options.Options{}
-
-	for _, opt := range opts {
-		opt.Apply(&options)
-	}
-
-	return t.topo.List(ctx, options.List)
+func (t *topo) List(ctx context.Context, opts ...ListOption) ([]topoapi.Object, error) {
+	return t.topoClient.List(ctx, opts...)
 
 }
 
-func (t *topoClient) Get(ctx context.Context, id topoapi.ID) (*topoapi.Object, error) {
-	return t.topo.Get(ctx, id)
+func (t *topo) Get(ctx context.Context, id topoapi.ID) (*topoapi.Object, error) {
+	return t.topoClient.Get(ctx, id)
 }
 
-func (t *topoClient) Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...options.Option) error {
-	options := options.Options{}
-
-	for _, opt := range opts {
-		opt.Apply(&options)
-	}
-
-	return t.topo.Watch(ctx, ch, options.Watch)
+func (t *topo) Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...WatchOption) error {
+	return t.topoClient.Watch(ctx, ch, opts...)
 }
