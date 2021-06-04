@@ -30,6 +30,8 @@ var log = logging.GetLogger("topo")
 
 // Client is a topo SDK client
 type Client interface {
+	// Create creates a topo object
+	Create(ctx context.Context, object *topoapi.Object) error
 
 	// Update updates a topo object
 	Update(ctx context.Context, object *topoapi.Object) error
@@ -90,15 +92,28 @@ type topo struct {
 	client topoapi.TopoClient
 }
 
+// Create creates a topo object
+func (t *topo) Create(ctx context.Context, object *topoapi.Object) error {
+	response, err := t.client.Create(ctx, &topoapi.CreateRequest{
+		Object: object,
+	})
+	if err != nil {
+		return errors.FromGRPC(err)
+	}
+	*object = *response.Object
+	return nil
+}
+
 // Update updates a given topo object
 func (t *topo) Update(ctx context.Context, object *topoapi.Object) error {
-	_, err := t.client.Update(ctx, &topoapi.UpdateRequest{
+	response, err := t.client.Update(ctx, &topoapi.UpdateRequest{
 		Object: object,
 	})
 	if err != nil {
 		return errors.FromGRPC(err)
 	}
 
+	*object = *response.Object
 	return nil
 }
 
