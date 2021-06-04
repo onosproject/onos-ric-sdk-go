@@ -21,6 +21,28 @@ type Options struct {
 	Service ServiceOptions
 }
 
+// WithTopoAddress sets the address for the topo service
+func WithTopoAddress(host string, port int) Option {
+	return newOption(func(options *Options) {
+		options.Service.Host = host
+		options.Service.Port = port
+	})
+}
+
+// WithTopoHost sets the host for the topo service
+func WithTopoHost(host string) Option {
+	return newOption(func(options *Options) {
+		options.Service.Host = host
+	})
+}
+
+// WithTopoPort sets the port for the topo service
+func WithTopoPort(port int) Option {
+	return newOption(func(options *Options) {
+		options.Service.Port = port
+	})
+}
+
 // ServiceOptions are the options for a service
 type ServiceOptions struct {
 	// Host is the service host

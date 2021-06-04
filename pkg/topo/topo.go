@@ -46,15 +46,15 @@ type Client interface {
 
 // NewClient creates a new topo client
 func NewClient(opts ...Option) (Client, error) {
-	clientOptions := Options{
-		Service: ServiceOptions{
-			Host: DefaultServiceHost,
-			Port: DefaultServicePort,
-		},
-	}
+	clientOptions := Options{}
 
 	for _, opt := range opts {
 		opt.apply(&clientOptions)
+	}
+
+	if clientOptions.Service.Host == "" || clientOptions.Service.Port == 0 {
+		clientOptions.Service.Host = DefaultServiceHost
+		clientOptions.Service.Port = DefaultServicePort
 	}
 
 	dialOpts := []grpc.DialOption{
