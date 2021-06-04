@@ -6,6 +6,10 @@ package topo
 
 import (
 	"context"
+	"io"
+
+	"github.com/onosproject/onos-lib-go/pkg/errors"
+	"google.golang.org/grpc/status"
 
 	"github.com/onosproject/onos-ric-sdk-go/pkg/utils/creds"
 	"google.golang.org/grpc/credentials"
@@ -74,35 +78,98 @@ func NewClient(opts ...Option) (Client, error) {
 		return nil, err
 	}
 
-	topoClient, err := NewTopoClient(conn)
-	if err != nil {
-		log.Warn(err)
-		return nil, err
-	}
+	cl := topoapi.NewTopoClient(conn)
 
 	return &topo{
-		topoClient: topoClient,
+		client: cl,
 	}, nil
 }
 
-// topoClient is the topo client implementation
+// topo is the topo client
 type topo struct {
-	topoClient TopoClient
+	client topoapi.TopoClient
 }
 
+// Update updates a given topo object
 func (t *topo) Update(ctx context.Context, object *topoapi.Object) error {
-	return t.topoClient.Update(ctx, object)
+	_, err := t.client.Update(ctx, &topoapi.UpdateRequest{
+		Object: object,
+	})
+	if err != nil {
+		return errors.FromGRPC(err)
+	}
+
+	return nil
 }
 
+// List lists all of topo objects
 func (t *topo) List(ctx context.Context, opts ...ListOption) ([]topoapi.Object, error) {
-	return t.topoClient.List(ctx, opts...)
+	options := ListOptions{}
 
+	for _, opt := range opts {
+		opt.apply(&options)
+	}
+
+	response, err := t.client.List(ctx, &topoapi.ListRequest{
+		Filters: options.GetFilters(),
+	})
+	if err != nil {
+		return nil, errors.FromGRPC(err)
+	}
+
+	return response.GetObjects(), nil
 }
 
+// Get get a topo object based on a given ID
 func (t *topo) Get(ctx context.Context, id topoapi.ID) (*topoapi.Object, error) {
-	return t.topoClient.Get(ctx, id)
+	response, err := t.client.Get(ctx, &topoapi.GetRequest{
+		ID: id,
+	})
+	if err != nil {
+		return nil, errors.FromGRPC(err)
+	}
+	return response.GetObject(), nil
 }
 
+// Watch watches topology events
 func (t *topo) Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...WatchOption) error {
-	return t.topoClient.Watch(ctx, ch, opts...)
+
+	options := WatchOptions{}
+	for _, opt := range opts {
+		opt.apply(&options)
+	}
+
+	req := topoapi.WatchRequest{
+		Filters: options.GetFilters(),
+	}
+	stream, err := t.client.Watch(ctx, &req)
+	if err != nil {
+		defer close(ch)
+		return errors.FromGRPC(err)
+	}
+
+	go func() {
+		defer close(ch)
+		for {
+			resp, err := stream.Recv()
+			if err == io.EOF || err == context.Canceled {
+				break
+			}
+
+			if err != nil {
+				stat, ok := status.FromError(err)
+				if ok {
+					err = errors.FromStatus(stat)
+					if errors.IsCanceled(err) || errors.IsTimeout(err) {
+						break
+					}
+				}
+				log.Error("An error occurred in receiving topology changes", err)
+			} else {
+				ch <- resp.Event
+			}
+		}
+	}()
+	return nil
+
 }
