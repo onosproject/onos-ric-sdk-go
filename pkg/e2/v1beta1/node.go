@@ -11,7 +11,9 @@ import (
 	e2api "github.com/onosproject/onos-api/go/onos/e2t/e2/v1beta1"
 	"github.com/onosproject/onos-lib-go/pkg/env"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
+	"github.com/onosproject/onos-ric-sdk-go/pkg/utils/creds"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"io"
 	"sync"
 )
@@ -90,7 +92,10 @@ func (n *e2Node) connect(ctx context.Context) (*grpc.ClientConn, error) {
 		return n.conn, nil
 	}
 
-	conn, err := grpc.DialContext(ctx, n.options.Service.GetAddress(), grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`))
+	clientCreds, _ := creds.GetClientCredentials()
+	conn, err := grpc.DialContext(ctx, n.options.Service.GetAddress(),
+		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`),
+		grpc.WithTransportCredentials(credentials.NewTLS(clientCreds)))
 	if err != nil {
 		return nil, err
 	}
