@@ -7,6 +7,9 @@ package e2
 import (
 	"context"
 	"fmt"
+	"io"
+	"sync"
+
 	"github.com/google/uuid"
 	e2api "github.com/onosproject/onos-api/go/onos/e2t/e2/v1beta1"
 	"github.com/onosproject/onos-lib-go/pkg/env"
@@ -14,8 +17,6 @@ import (
 	"github.com/onosproject/onos-ric-sdk-go/pkg/utils/creds"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"io"
-	"sync"
 )
 
 // NodeID is an E2 node identifier
@@ -37,6 +38,9 @@ type Node interface {
 
 	// Control creates and sends a E2 control message and awaits the outcome
 	Control(ctx context.Context, message *e2api.ControlMessage) (*e2api.ControlOutcome, error)
+
+	// Close closes an E2 node connection
+	Close() error
 }
 
 // NewNode creates a new E2 Node with the given ID
