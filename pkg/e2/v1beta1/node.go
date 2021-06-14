@@ -178,6 +178,7 @@ func (n *e2Node) Subscribe(ctx context.Context, sub *e2api.Subscription, indCh c
 				if !acked {
 					ackCh <- err
 					close(ackCh)
+					acked = true
 					break
 				}
 			} else {
