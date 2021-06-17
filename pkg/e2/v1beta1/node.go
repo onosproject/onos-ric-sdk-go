@@ -33,7 +33,10 @@ type Node interface {
 	// to the given channel.
 	// If the subscription is successful, a subscription.Context will be returned. The subscription
 	// context can be used to cancel the subscription by calling Close() on the subscription.Context.
-	Subscribe(ctx context.Context, sub *e2api.Subscription, indCh chan<- e2api.Indication) error
+	Subscribe(ctx context.Context, name string, sub e2api.SubscriptionSpec, indCh chan<- e2api.Indication) error
+
+	// Unsubscribe unsubscribes from the given subscription
+	Unsubscribe(ctx context.Context, name string) error
 
 	// Control creates and sends a E2 control message and awaits the outcome
 	Control(ctx context.Context, message *e2api.ControlMessage) (*e2api.ControlOutcome, error)
@@ -141,7 +144,7 @@ func (n *e2Node) Control(ctx context.Context, message *e2api.ControlMessage) (*e
 	return &response.Outcome, nil
 }
 
-func (n *e2Node) Subscribe(ctx context.Context, sub *e2api.Subscription, indCh chan<- e2api.Indication) error {
+func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.SubscriptionSpec, indCh chan<- e2api.Indication) error {
 	conn, err := n.connect(ctx)
 	if err != nil {
 		return err
@@ -149,8 +152,9 @@ func (n *e2Node) Subscribe(ctx context.Context, sub *e2api.Subscription, indCh c
 	client := e2api.NewSubscriptionServiceClient(conn)
 
 	request := &e2api.SubscribeRequest{
-		Headers:      n.getRequestHeaders(),
-		Subscription: *sub,
+		Headers:       n.getRequestHeaders(),
+		TransactionID: e2api.TransactionID(name),
+		Subscription:  sub,
 	}
 	stream, err := client.Subscribe(ctx, request)
 	if err != nil {
@@ -202,6 +206,24 @@ func (n *e2Node) Subscribe(ctx context.Context, sub *e2api.Subscription, indCh c
 	case <-ctx.Done():
 		return ctx.Err()
 	}
+}
+
+func (n *e2Node) Unsubscribe(ctx context.Context, name string) error {
+	conn, err := n.connect(ctx)
+	if err != nil {
+		return err
+	}
+	client := e2api.NewSubscriptionServiceClient(conn)
+
+	request := &e2api.UnsubscribeRequest{
+		Headers:       n.getRequestHeaders(),
+		TransactionID: e2api.TransactionID(name),
+	}
+	_, err = client.Unsubscribe(ctx, request)
+	if err != nil {
+		return errors.FromGRPC(err)
+	}
+	return nil
 }
 
 func (n *e2Node) Close() error {
