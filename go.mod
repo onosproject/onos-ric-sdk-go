@@ -40,4 +40,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 )
 
-replace github.com/onosproject/onos-api/go => ../onos-api/go
+replace github.com/onosproject/onos-api/go => github.com/kuujo/onos-api/go v0.0.0-20210616014438-75078968dc85
