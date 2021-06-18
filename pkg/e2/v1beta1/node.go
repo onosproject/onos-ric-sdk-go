@@ -115,9 +115,9 @@ func (n *e2Node) getRequestHeaders() e2api.RequestHeaders {
 		encoding = e2api.Encoding_ASN1_PER
 	}
 	return e2api.RequestHeaders{
-		AppID:      e2api.AppID(n.options.App.AppID),
-		InstanceID: e2api.InstanceID(n.options.App.InstanceID),
-		NodeID:     e2api.NodeID(n.nodeID),
+		AppID:         e2api.AppID(n.options.App.AppID),
+		AppInstanceID: e2api.AppInstanceID(n.options.App.InstanceID),
+		E2NodeID:      e2api.E2NodeID(n.nodeID),
 		ServiceModel: e2api.ServiceModel{
 			Name:    e2api.ServiceModelName(n.options.ServiceModel.Name),
 			Version: e2api.ServiceModelVersion(n.options.ServiceModel.Version),
