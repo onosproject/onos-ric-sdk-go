@@ -7,6 +7,9 @@ package e2
 import (
 	"context"
 	"fmt"
+	"io"
+	"sync"
+
 	"github.com/google/uuid"
 	e2api "github.com/onosproject/onos-api/go/onos/e2t/e2/v1beta1"
 	"github.com/onosproject/onos-lib-go/pkg/env"
@@ -14,8 +17,6 @@ import (
 	"github.com/onosproject/onos-ric-sdk-go/pkg/utils/creds"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"io"
-	"sync"
 )
 
 // NodeID is an E2 node identifier
@@ -33,7 +34,7 @@ type Node interface {
 	// to the given channel.
 	// If the subscription is successful, a subscription.Context will be returned. The subscription
 	// context can be used to cancel the subscription by calling Close() on the subscription.Context.
-	Subscribe(ctx context.Context, name string, sub e2api.SubscriptionSpec, indCh chan<- e2api.Indication) error
+	Subscribe(ctx context.Context, name string, sub e2api.SubscriptionSpec, indCh chan<- e2api.Indication) (e2api.ChannelID, error)
 
 	// Unsubscribe unsubscribes from the given subscription
 	Unsubscribe(ctx context.Context, name string) error
@@ -65,6 +66,11 @@ func NewNode(nodeID NodeID, opts ...Option) Node {
 		nodeID:  nodeID,
 		options: options,
 	}
+}
+
+type ackResult struct {
+	err       error
+	channelID e2api.ChannelID
 }
 
 // e2Node is the default E2 node implementation
@@ -144,10 +150,10 @@ func (n *e2Node) Control(ctx context.Context, message *e2api.ControlMessage) (*e
 	return &response.Outcome, nil
 }
 
-func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.SubscriptionSpec, indCh chan<- e2api.Indication) error {
+func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.SubscriptionSpec, indCh chan<- e2api.Indication) (e2api.ChannelID, error) {
 	conn, err := n.connect(ctx)
 	if err != nil {
-		return err
+		return "", err
 	}
 	client := e2api.NewSubscriptionServiceClient(conn)
 
@@ -159,13 +165,12 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 	stream, err := client.Subscribe(ctx, request)
 	if err != nil {
 		defer close(indCh)
-		return errors.FromGRPC(err)
+		return "", errors.FromGRPC(err)
 	}
 
-	ackCh := make(chan error)
+	ackCh := make(chan ackResult)
 	go func() {
 		defer close(indCh)
-
 		acked := false
 		for {
 			response, err := stream.Recv()
@@ -180,7 +185,10 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 				}
 				log.Error("An error occurred in receiving Subscription changes", err)
 				if !acked {
-					ackCh <- err
+					ackCh <- ackResult{
+						err:       err,
+						channelID: response.GetAck().ChannelID,
+					}
 					close(ackCh)
 					acked = true
 					break
@@ -188,6 +196,10 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 			} else {
 				switch m := response.Message.(type) {
 				case *e2api.SubscribeResponse_Ack:
+					ackCh <- ackResult{
+						err:       nil,
+						channelID: response.GetAck().GetChannelID(),
+					}
 					close(ackCh)
 					acked = true
 				case *e2api.SubscribeResponse_Indication:
@@ -201,10 +213,10 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 	}()
 
 	select {
-	case <-ackCh:
-		return nil
+	case result := <-ackCh:
+		return result.channelID, result.err
 	case <-ctx.Done():
-		return ctx.Err()
+		return "", ctx.Err()
 	}
 }
 
