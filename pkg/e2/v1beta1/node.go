@@ -143,10 +143,13 @@ func (n *e2Node) Control(ctx context.Context, message *e2api.ControlMessage) (*e
 		Headers: n.getRequestHeaders(),
 		Message: *message,
 	}
+	log.Debugf("Sending ControlRequest %+v", request)
 	response, err := client.Control(ctx, request)
 	if err != nil {
+		log.Warnf("ControlRequest %+v failed: %v", request, err)
 		return nil, errors.FromGRPC(err)
 	}
+	log.Debugf("Received ControlResponse %+v", response)
 	return &response.Outcome, nil
 }
 
@@ -162,6 +165,7 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 		TransactionID: e2api.TransactionID(name),
 		Subscription:  sub,
 	}
+	log.Debugf("Sending SubscribeRequest %+v", request)
 	stream, err := client.Subscribe(ctx, request)
 	if err != nil {
 		defer close(indCh)
@@ -172,18 +176,20 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 	go func() {
 		defer close(indCh)
 		acked := false
+		var channelID e2api.ChannelID
 		for {
 			response, err := stream.Recv()
-			err = errors.FromGRPC(err)
-			if err == io.EOF || err == context.Canceled || errors.IsCanceled(err) {
+			if err == io.EOF || err == context.Canceled {
 				break
 			}
 
 			if err != nil {
+				err = errors.FromGRPC(err)
 				if errors.IsCanceled(err) || errors.IsTimeout(err) {
 					break
 				}
-				log.Error("An error occurred in receiving Subscription changes", err)
+
+				log.Warnf("SubscribeRequest %+v failed: %v", request, err)
 				if !acked {
 					ackCh <- ackResult{
 						err:       err,
@@ -194,14 +200,17 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 					break
 				}
 			} else {
+				log.Debugf("Received SubscribeResponse %+v", response)
 				switch m := response.Message.(type) {
 				case *e2api.SubscribeResponse_Ack:
-					ackCh <- ackResult{
-						err:       nil,
-						channelID: response.GetAck().GetChannelID(),
+					channelID = m.Ack.ChannelID
+					if !acked {
+						ackCh <- ackResult{
+							channelID: channelID,
+						}
+						close(ackCh)
+						acked = true
 					}
-					close(ackCh)
-					acked = true
 				case *e2api.SubscribeResponse_Indication:
 					indCh <- *m.Indication
 				}
@@ -231,10 +240,13 @@ func (n *e2Node) Unsubscribe(ctx context.Context, name string) error {
 		Headers:       n.getRequestHeaders(),
 		TransactionID: e2api.TransactionID(name),
 	}
-	_, err = client.Unsubscribe(ctx, request)
+	log.Debugf("Sending UnsubscribeRequest %+v", request)
+	response, err := client.Unsubscribe(ctx, request)
 	if err != nil {
+		log.Warnf("UnsubscribeRequest %+v failed: %v", request, err)
 		return errors.FromGRPC(err)
 	}
+	log.Debugf("Received UnsubscribeResponse %+v", response)
 	return nil
 }
 
