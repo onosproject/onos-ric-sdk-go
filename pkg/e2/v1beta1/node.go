@@ -190,10 +190,15 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 				}
 
 				log.Warnf("SubscribeRequest %+v failed: %v", request, err)
+				channelID := e2api.ChannelID("")
+				ack := response.GetAck()
+				if ack != nil {
+					channelID = ack.ChannelID
+				}
 				if !acked {
 					ackCh <- ackResult{
 						err:       err,
-						channelID: response.GetAck().ChannelID,
+						channelID: channelID,
 					}
 					close(ackCh)
 					acked = true
