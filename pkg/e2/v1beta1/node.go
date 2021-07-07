@@ -127,6 +127,8 @@ func (n *e2Node) getRequestHeaders() e2api.RequestHeaders {
 		encoding = e2api.Encoding_PROTO
 	case ASN1Encoding:
 		encoding = e2api.Encoding_ASN1_PER
+	default:
+		encoding = e2api.Encoding(n.options.Encoding)
 	}
 	return e2api.RequestHeaders{
 		AppID:         e2api.AppID(n.options.App.AppID),
