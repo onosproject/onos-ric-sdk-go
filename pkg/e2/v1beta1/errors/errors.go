@@ -476,3 +476,27 @@ func IsMiscHardwareFailure(err error) bool {
 func IsMiscOMIntervention(err error) bool {
 	return IsType(err, MiscOMIntervention)
 }
+
+func IsE2APError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	stat, ok := status.FromError(err)
+	if !ok {
+		return false
+	}
+	details := stat.Details()
+
+	if len(details) == 0 {
+		return false
+	}
+
+	switch details[0].(type) {
+	case *e2api.Error:
+		return true
+
+	default:
+		return false
+	}
+}
