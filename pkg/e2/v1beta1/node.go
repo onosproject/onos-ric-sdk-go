@@ -14,6 +14,7 @@ import (
 	e2api "github.com/onosproject/onos-api/go/onos/e2t/e2/v1beta1"
 	"github.com/onosproject/onos-lib-go/pkg/env"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
+	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/v1beta1/e2errors"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/utils/creds"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -112,6 +113,13 @@ func (n *e2Node) connect(ctx context.Context) (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
+func getErrorFromGRPC(err error) error {
+	if e2errors.IsE2APError(err) {
+		return e2errors.FromGRPC(err)
+	}
+	return errors.FromGRPC(err)
+}
+
 func (n *e2Node) getRequestHeaders() e2api.RequestHeaders {
 	var encoding e2api.Encoding
 	switch n.options.Encoding {
@@ -147,7 +155,7 @@ func (n *e2Node) Control(ctx context.Context, message *e2api.ControlMessage) (*e
 	response, err := client.Control(ctx, request)
 	if err != nil {
 		log.Warnf("ControlRequest %+v failed: %v", request, err)
-		return nil, errors.FromGRPC(err)
+		return nil, getErrorFromGRPC(err)
 	}
 	log.Debugf("Received ControlResponse %+v", response)
 	return &response.Outcome, nil
@@ -169,7 +177,7 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 	stream, err := client.Subscribe(ctx, request)
 	if err != nil {
 		defer close(indCh)
-		return "", errors.FromGRPC(err)
+		return "", getErrorFromGRPC(err)
 	}
 
 	ackCh := make(chan ackResult)
@@ -184,7 +192,7 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 			}
 
 			if err != nil {
-				err = errors.FromGRPC(err)
+				err = getErrorFromGRPC(err)
 				if errors.IsCanceled(err) || errors.IsTimeout(err) {
 					break
 				}
@@ -249,7 +257,7 @@ func (n *e2Node) Unsubscribe(ctx context.Context, name string) error {
 	response, err := client.Unsubscribe(ctx, request)
 	if err != nil {
 		log.Warnf("UnsubscribeRequest %+v failed: %v", request, err)
-		return errors.FromGRPC(err)
+		return getErrorFromGRPC(err)
 	}
 	log.Debugf("Received UnsubscribeResponse %+v", response)
 	return nil

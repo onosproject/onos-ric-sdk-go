@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package errors
+package e2errors
 
 import (
 	"fmt"
@@ -477,6 +477,7 @@ func IsMiscOMIntervention(err error) bool {
 	return IsType(err, MiscOMIntervention)
 }
 
+// IsE2APError checks if a given error is an E2AP error
 func IsE2APError(err error) bool {
 	if err == nil {
 		return false
