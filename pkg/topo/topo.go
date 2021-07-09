@@ -155,7 +155,8 @@ func (t *topo) Watch(ctx context.Context, ch chan<- topoapi.Event, opts ...Watch
 	}
 
 	req := topoapi.WatchRequest{
-		Filters: options.GetFilters(),
+		Filters:  options.GetFilters(),
+		Noreplay: options.GetNoReplay(),
 	}
 	stream, err := t.client.Watch(ctx, &req)
 	if err != nil {

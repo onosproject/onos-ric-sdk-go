@@ -104,12 +104,18 @@ func WithOptions(opts Options) Option {
 
 // WatchOptions topo client watch method options
 type WatchOptions struct {
-	filters *topoapi.Filters
+	filters  *topoapi.Filters
+	noReplay bool
 }
 
 // GetFilters get filters
 func (w WatchOptions) GetFilters() *topoapi.Filters {
 	return w.filters
+}
+
+// GetNoReplay gets no replay option
+func (w WatchOptions) GetNoReplay() bool {
+	return w.noReplay
 }
 
 // WatchOption topo client watch option
@@ -135,6 +141,13 @@ func newWatchOption(f func(*WatchOptions)) WatchOption {
 func WithWatchFilters(filters *topoapi.Filters) WatchOption {
 	return newWatchOption(func(o *WatchOptions) {
 		o.filters = filters
+	})
+}
+
+// WithNoReplay sets no replay option
+func WithNoReplay(noReplay bool) WatchOption {
+	return newWatchOption(func(o *WatchOptions) {
+		o.noReplay = noReplay
 	})
 }
 
