@@ -7,8 +7,10 @@ package e2
 import (
 	"context"
 	"fmt"
+	"github.com/onosproject/onos-lib-go/pkg/southbound"
 	"io"
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 	e2api "github.com/onosproject/onos-api/go/onos/e2t/e2/v1beta1"
@@ -105,7 +107,9 @@ func (n *e2Node) connect(ctx context.Context) (*grpc.ClientConn, error) {
 	clientCreds, _ := creds.GetClientCredentials()
 	conn, err := grpc.DialContext(ctx, n.options.Service.GetAddress(),
 		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`),
-		grpc.WithTransportCredentials(credentials.NewTLS(clientCreds)))
+		grpc.WithTransportCredentials(credentials.NewTLS(clientCreds)),
+		grpc.WithUnaryInterceptor(southbound.RetryingUnaryClientInterceptor()),
+		grpc.WithStreamInterceptor(southbound.RetryingStreamClientInterceptor(time.Second)))
 	if err != nil {
 		return nil, err
 	}
