@@ -8,6 +8,8 @@ import (
 	"context"
 	"io"
 
+	"github.com/onosproject/onos-lib-go/pkg/grpc/retry"
+
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"google.golang.org/grpc/status"
 
@@ -18,11 +20,8 @@ import (
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 
-	"time"
-
 	"github.com/onosproject/onos-ric-sdk-go/pkg/topo/connection"
 
-	"github.com/onosproject/onos-lib-go/pkg/southbound"
 	"google.golang.org/grpc"
 )
 
@@ -60,8 +59,8 @@ func NewClient(opts ...Option) (Client, error) {
 	}
 
 	dialOpts := []grpc.DialOption{
-		grpc.WithStreamInterceptor(southbound.RetryingStreamClientInterceptor(100 * time.Millisecond)),
-		grpc.WithUnaryInterceptor(southbound.RetryingUnaryClientInterceptor()),
+		grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor()),
+		grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor()),
 	}
 	if clientOptions.Service.Insecure {
 		dialOpts = append(dialOpts, grpc.WithInsecure())
