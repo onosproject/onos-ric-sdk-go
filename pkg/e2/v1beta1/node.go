@@ -104,8 +104,8 @@ func (n *e2Node) connect(ctx context.Context) (*grpc.ClientConn, error) {
 	}
 
 	clientCreds, _ := creds.GetClientCredentials()
-	conn, err := grpc.DialContext(ctx, n.options.Service.GetAddress(),
-		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`),
+	conn, err := grpc.DialContext(ctx, fmt.Sprintf("%s:///%s", resolverName, n.options.Service.GetAddress()),
+		grpc.WithResolvers(newResolver(n.nodeID)),
 		grpc.WithTransportCredentials(credentials.NewTLS(clientCreds)),
 		grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor()),
 		grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor()))
