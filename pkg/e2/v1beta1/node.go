@@ -107,8 +107,8 @@ func (n *e2Node) connect(ctx context.Context) (*grpc.ClientConn, error) {
 	conn, err := grpc.DialContext(ctx, n.options.Service.GetAddress(),
 		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`),
 		grpc.WithTransportCredentials(credentials.NewTLS(clientCreds)),
-		grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor(retry.WithRetryOn())),
-		grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor(retry.WithRetryOn())))
+		grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor()),
+		grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor()))
 	if err != nil {
 		return nil, err
 	}

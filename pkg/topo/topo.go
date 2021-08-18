@@ -59,8 +59,8 @@ func NewClient(opts ...Option) (Client, error) {
 	}
 
 	dialOpts := []grpc.DialOption{
-		grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor(retry.WithRetryOn())),
-		grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor(retry.WithRetryOn())),
+		grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor()),
+		grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor()),
 	}
 	if clientOptions.Service.Insecure {
 		dialOpts = append(dialOpts, grpc.WithInsecure())
