@@ -108,7 +108,6 @@ func (r *Resolver) start() error {
 						var addrs []resolver.Address
 						addrs = append(addrs, resolver.Address{
 							Addr: address,
-							Type: resolver.Backend,
 							Attributes: attributes.New(
 								"is_master",
 								true,
@@ -119,7 +118,6 @@ func (r *Resolver) start() error {
 							if nodeID != topo.ID(m.NodeId) {
 								addrs = append(addrs, resolver.Address{
 									Addr: address,
-									Type: resolver.Backend,
 									Attributes: attributes.New(
 										"is_master",
 										false,
