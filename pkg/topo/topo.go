@@ -6,9 +6,8 @@ package topo
 
 import (
 	"context"
-	"io"
-
 	"github.com/onosproject/onos-lib-go/pkg/grpc/retry"
+	"io"
 
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"google.golang.org/grpc/status"

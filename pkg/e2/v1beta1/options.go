@@ -35,6 +35,8 @@ type Options struct {
 	ServiceModel ServiceModelOptions
 	// Service is the E2 termination service configuration
 	Service ServiceOptions
+	// Topo is the topology service configuration
+	Topo ServiceOptions
 	// Encoding is the default encoding
 	Encoding Encoding
 }
