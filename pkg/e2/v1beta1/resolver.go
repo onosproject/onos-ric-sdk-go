@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"github.com/onosproject/onos-api/go/onos/topo"
 	"github.com/onosproject/onos-lib-go/pkg/grpc/retry"
-	"github.com/onosproject/onos-lib-go/pkg/uri"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/attributes"
 	"google.golang.org/grpc/codes"
@@ -19,14 +18,16 @@ import (
 
 const resolverName = "e2"
 
-func newResolver(nodeID NodeID) resolver.Builder {
+func newResolver(nodeID NodeID, opts Options) resolver.Builder {
 	return &ResolverBuilder{
 		nodeID: nodeID,
+		opts:   opts,
 	}
 }
 
 type ResolverBuilder struct {
 	nodeID NodeID
+	opts   Options
 }
 
 func (b *ResolverBuilder) Scheme() string {
@@ -47,7 +48,7 @@ func (b *ResolverBuilder) Build(target resolver.Target, cc resolver.ClientConn, 
 	dialOpts = append(dialOpts, grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor(retry.WithRetryOn(codes.Unavailable, codes.Unknown))))
 	dialOpts = append(dialOpts, grpc.WithContextDialer(opts.Dialer))
 
-	resolverConn, err := grpc.Dial(target.Endpoint, dialOpts...)
+	resolverConn, err := grpc.Dial(b.opts.Topo.GetAddress(), dialOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +87,6 @@ func (r *Resolver) start() error {
 		return err
 	}
 	go func() {
-		nodeURI := uri.NewURI(uri.WithScheme("e2"), uri.WithOpaque(string(r.nodeID)))
 		var mastership *topo.MastershipState
 		e2tNodes := make(map[topo.ID]string)
 		for {
@@ -98,9 +98,9 @@ func (r *Resolver) start() error {
 			object := response.Event.Object
 			if entity, ok := object.Obj.(*topo.Object_Entity); ok &&
 				entity.Entity.KindID == topo.E2NODE &&
-				string(object.ID) == nodeURI.String() {
-				m := topo.MastershipState{}
-				object.GetAspect(&m)
+				object.ID == topo.ID(r.nodeID) {
+				var m topo.MastershipState
+				_ = object.GetAspect(&m)
 				if m.NodeId != "" && (mastership == nil || m.Term > mastership.Term) {
 					mastership = &m
 					address, ok := e2tNodes[topo.ID(mastership.NodeId)]
@@ -138,8 +138,8 @@ func (r *Resolver) start() error {
 				case topo.EventType_REMOVED:
 					delete(e2tNodes, object.ID)
 				default:
-					info := topo.E2TInfo{}
-					object.GetAspect(&info)
+					var info topo.E2TInfo
+					_ = object.GetAspect(&info)
 					for _, iface := range info.Interfaces {
 						if iface.Type == topo.Interface_INTERFACE_E2T {
 							e2tNodes[object.ID] = fmt.Sprintf("%s:%d", iface.IP, iface.Port)

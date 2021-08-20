@@ -56,6 +56,10 @@ func NewNode(nodeID NodeID, opts ...Option) Node {
 			Host: "onos-e2t",
 			Port: defaultServicePort,
 		},
+		Topo: ServiceOptions{
+			Host: "onos-topo",
+			Port: defaultServicePort,
+		},
 		Encoding: ProtoEncoding,
 	}
 	for _, opt := range opts {
@@ -105,7 +109,7 @@ func (n *e2Node) connect(ctx context.Context) (*grpc.ClientConn, error) {
 
 	clientCreds, _ := creds.GetClientCredentials()
 	conn, err := grpc.DialContext(ctx, fmt.Sprintf("%s:///%s", resolverName, n.options.Service.GetAddress()),
-		grpc.WithResolvers(newResolver(n.nodeID)),
+		grpc.WithResolvers(newResolver(n.nodeID, n.options)),
 		grpc.WithTransportCredentials(credentials.NewTLS(clientCreds)),
 		grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor()),
 		grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor()))
