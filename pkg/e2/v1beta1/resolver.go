@@ -62,6 +62,8 @@ func (b *ResolverBuilder) Build(target resolver.Target, cc resolver.ClientConn, 
 		clientConn:    cc,
 		resolverConn:  resolverConn,
 		serviceConfig: serviceConfig,
+		nodes:         make(map[topo.ID]topo.ID),
+		addresses:     make(map[topo.ID]string),
 	}
 	err = resolver.start()
 	if err != nil {
@@ -77,6 +79,9 @@ type Resolver struct {
 	clientConn    resolver.ClientConn
 	resolverConn  *grpc.ClientConn
 	serviceConfig *serviceconfig.ParseResult
+	mastership    *topo.MastershipState
+	nodes         map[topo.ID]topo.ID
+	addresses     map[topo.ID]string
 }
 
 func (r *Resolver) start() error {
@@ -87,69 +92,96 @@ func (r *Resolver) start() error {
 		return err
 	}
 	go func() {
-		var mastership *topo.MastershipState
-		e2tNodes := make(map[topo.ID]string)
 		for {
 			response, err := stream.Recv()
 			if err != nil {
 				return
 			}
-
-			object := response.Event.Object
-			if entity, ok := object.Obj.(*topo.Object_Entity); ok &&
-				entity.Entity.KindID == topo.E2NODE &&
-				object.ID == topo.ID(r.nodeID) {
-				var m topo.MastershipState
-				_ = object.GetAspect(&m)
-				if m.NodeId != "" && (mastership == nil || m.Term > mastership.Term) {
-					mastership = &m
-					address, ok := e2tNodes[topo.ID(mastership.NodeId)]
-					if ok {
-						var addrs []resolver.Address
-						addrs = append(addrs, resolver.Address{
-							Addr: address,
-							Attributes: attributes.New(
-								"is_master",
-								true,
-							),
-						})
-
-						for nodeID, address := range e2tNodes {
-							if nodeID != topo.ID(m.NodeId) {
-								addrs = append(addrs, resolver.Address{
-									Addr: address,
-									Attributes: attributes.New(
-										"is_master",
-										false,
-									),
-								})
-							}
-						}
-
-						r.clientConn.UpdateState(resolver.State{
-							Addresses:     addrs,
-							ServiceConfig: r.serviceConfig,
-						})
-					}
-				}
-			} else if entity, ok := object.Obj.(*topo.Object_Entity); ok &&
-				entity.Entity.KindID == topo.E2T {
-				switch response.Event.Type {
-				case topo.EventType_REMOVED:
-					delete(e2tNodes, object.ID)
-				default:
-					var info topo.E2TInfo
-					_ = object.GetAspect(&info)
-					for _, iface := range info.Interfaces {
-						if iface.Type == topo.Interface_INTERFACE_E2T {
-							e2tNodes[object.ID] = fmt.Sprintf("%s:%d", iface.IP, iface.Port)
-						}
-					}
-				}
-			}
+			r.handleEvent(response.Event)
 		}
 	}()
 	return nil
+}
+
+func (r *Resolver) handleEvent(event topo.Event) {
+	object := event.Object
+	if entity, ok := object.Obj.(*topo.Object_Entity); ok &&
+		entity.Entity.KindID == topo.E2NODE &&
+		object.ID == topo.ID(r.nodeID) {
+		var m topo.MastershipState
+		_ = object.GetAspect(&m)
+		if m.NodeId != "" && (r.mastership == nil || m.Term > r.mastership.Term) {
+			r.mastership = &m
+			r.updateState()
+		}
+	} else if entity, ok := object.Obj.(*topo.Object_Entity); ok &&
+		entity.Entity.KindID == topo.E2T {
+		switch event.Type {
+		case topo.EventType_REMOVED:
+			delete(r.addresses, object.ID)
+		default:
+			var info topo.E2TInfo
+			_ = object.GetAspect(&info)
+			for _, iface := range info.Interfaces {
+				if iface.Type == topo.Interface_INTERFACE_E2T {
+					r.addresses[object.ID] = fmt.Sprintf("%s:%d", iface.IP, iface.Port)
+				}
+			}
+		}
+		r.updateState()
+	} else if relation, ok := object.Obj.(*topo.Object_Relation); ok &&
+		relation.Relation.KindID == topo.CONTROLS &&
+		relation.Relation.TgtEntityID == topo.ID(r.nodeID) {
+		switch event.Type {
+		case topo.EventType_REMOVED:
+			delete(r.nodes, object.ID)
+		default:
+			r.nodes[object.ID] = relation.Relation.SrcEntityID
+		}
+		r.updateState()
+	}
+}
+
+func (r *Resolver) updateState() {
+	if r.mastership == nil {
+		return
+	}
+
+	master, ok := r.nodes[topo.ID(r.mastership.NodeId)]
+	if !ok {
+		return
+	}
+
+	address, ok := r.addresses[master]
+	if !ok {
+		return
+	}
+
+	var addrs []resolver.Address
+	addrs = append(addrs, resolver.Address{
+		Addr: address,
+		Attributes: attributes.New(
+			"is_master",
+			true,
+		),
+	})
+
+	for nodeID, address := range r.addresses {
+		if nodeID != master {
+			addrs = append(addrs, resolver.Address{
+				Addr: address,
+				Attributes: attributes.New(
+					"is_master",
+					false,
+				),
+			})
+		}
+	}
+
+	r.clientConn.UpdateState(resolver.State{
+		Addresses:     addrs,
+		ServiceConfig: r.serviceConfig,
+	})
 }
 
 func (r *Resolver) ResolveNow(resolver.ResolveNowOptions) {}
