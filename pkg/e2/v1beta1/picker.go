@@ -7,7 +7,6 @@ package e2
 import (
 	"google.golang.org/grpc/balancer"
 	"google.golang.org/grpc/balancer/base"
-	"math/rand"
 )
 
 func init() {
@@ -26,9 +25,6 @@ func (p *PickerBuilder) Build(info base.PickerBuildInfo) balancer.Picker {
 			continue
 		}
 		backups = append(backups, sc)
-	}
-	if master == nil && len(backups) > 0 {
-		master = backups[rand.Intn(len(backups))]
 	}
 	log.Debugf("Built new picker. Master: %s, Backups: %s", master, backups)
 	return &Picker{
