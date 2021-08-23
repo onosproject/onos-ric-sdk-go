@@ -10,6 +10,7 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/certs"
 )
 
+// GetClientCredentials :
 func GetClientCredentials() (*tls.Config, error) {
 	cert, err := tls.X509KeyPair([]byte(certs.DefaultClientCrt), []byte(certs.DefaultClientKey))
 	if err != nil {

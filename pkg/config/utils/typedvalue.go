@@ -15,7 +15,7 @@ import (
 
 // TODO Add more conversions as needed
 
-// ToUint converts an interface value to uint64
+// ToUint64 converts an interface value to uint64
 func ToUint64(value interface{}) (uint64, error) {
 	switch v := value.(type) {
 	case *gnmi.TypedValue:
@@ -47,7 +47,7 @@ func ToFloat(value interface{}) (float32, error) {
 		return toGnmiTypedValue(value).GetFloatVal(), nil
 
 	case float32:
-		return float32(v), nil
+		return v, nil
 
 	default:
 		return 0, errors.New(errors.NotSupported, "Not supported type %v", v)
@@ -70,7 +70,7 @@ func ToString(value interface{}) (string, error) {
 
 }
 
-// ToGnmiTypedValue
+// toGnmiTypedValue
 func toGnmiTypedValue(value interface{}) *gnmi.TypedValue {
 	return value.(*gnmi.TypedValue)
 }

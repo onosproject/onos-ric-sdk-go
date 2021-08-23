@@ -23,6 +23,7 @@ type Entry struct {
 	EventType string
 }
 
+// Store :
 type Store interface {
 	Put(key string, entry Entry) error
 
@@ -31,11 +32,13 @@ type Store interface {
 	Watch(ctx context.Context, ch chan event.Event) error
 }
 
+// ConfigStore :
 type ConfigStore struct {
 	ConfigTree map[string]interface{}
 	eventBus   *EventBus
 }
 
+// NewConfigStore :
 func NewConfigStore() *ConfigStore {
 	return &ConfigStore{
 		ConfigTree: make(map[string]interface{}),
@@ -45,6 +48,7 @@ func NewConfigStore() *ConfigStore {
 	}
 }
 
+// Watch :
 func (c *ConfigStore) Watch(ctx context.Context, ch chan event.Event) error {
 	c.eventBus.rm.Lock()
 	cw := ConfigTreeWatcher{
@@ -73,6 +77,7 @@ func (c *ConfigStore) Watch(ctx context.Context, ch chan event.Event) error {
 	return nil
 }
 
+// Put :
 func (c *ConfigStore) Put(key string, entry Entry) error {
 	err := put(c.ConfigTree, key, entry)
 	if err != nil {
@@ -87,6 +92,7 @@ func (c *ConfigStore) Put(key string, entry Entry) error {
 	return nil
 }
 
+// Get :
 func (c *ConfigStore) Get(key string) (Entry, error) {
 	node, err := get(c.ConfigTree, key)
 	if err != nil {

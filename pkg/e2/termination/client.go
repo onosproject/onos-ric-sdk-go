@@ -68,7 +68,7 @@ func (c *terminationClient) Stream(ctx context.Context, responseCh chan<- e2tapi
 					log.Error(err)
 				}
 			case <-ctx.Done():
-				break
+				return
 			}
 		}
 	}()

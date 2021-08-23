@@ -13,8 +13,10 @@ func init() {
 	balancer.Register(base.NewBalancerBuilder(resolverName, &PickerBuilder{}, base.Config{}))
 }
 
+// PickerBuilder :
 type PickerBuilder struct{}
 
+// Build :
 func (p *PickerBuilder) Build(info base.PickerBuildInfo) balancer.Picker {
 	var master balancer.SubConn
 	var backups []balancer.SubConn
@@ -34,10 +36,12 @@ func (p *PickerBuilder) Build(info base.PickerBuildInfo) balancer.Picker {
 
 var _ base.PickerBuilder = (*PickerBuilder)(nil)
 
+// Picker :
 type Picker struct {
 	master balancer.SubConn
 }
 
+// Pick :
 func (p *Picker) Pick(info balancer.PickInfo) (balancer.PickResult, error) {
 	var result balancer.PickResult
 	if p.master == nil {

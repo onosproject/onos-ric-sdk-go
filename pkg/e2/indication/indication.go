@@ -15,8 +15,8 @@ type Indication struct {
 	Payload Payload
 }
 
-// E2 indication payload
+// Payload is an E2 indication payload
 type Payload struct {
-	Header []byte
+	Header  []byte
 	Message []byte
 }

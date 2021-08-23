@@ -27,9 +27,11 @@ const (
 	gnmiAgentPort = 9339
 )
 
+// RegisterRequest :
 type RegisterRequest struct {
 }
 
+// RegisterResponse :
 type RegisterResponse struct {
 	Config interface{}
 }

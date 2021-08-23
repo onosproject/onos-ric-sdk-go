@@ -15,6 +15,7 @@ import (
 // E2APType is an E2AP error type
 type E2APType int
 
+// Error type constants
 const (
 	Unknown E2APType = iota
 
@@ -71,7 +72,7 @@ const (
 	MiscOMIntervention
 )
 
-// TypedError is an typed error
+// TypedError is a typed error
 type TypedError struct {
 	// E2APType is the E2AP error type
 	E2APType E2APType

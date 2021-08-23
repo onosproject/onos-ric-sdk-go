@@ -10,10 +10,12 @@ import (
 	"github.com/onosproject/onos-ric-sdk-go/pkg/config/event"
 )
 
+// Entry :
 type Entry struct {
 	Value interface{}
 }
 
+// Configuration :
 type Configuration interface {
 	Config() interface{}
 

@@ -12,12 +12,12 @@ import (
 
 var log = logging.GetLogger("config", "callback")
 
-// Config
+// Config :
 type Config struct {
 	config *store.ConfigStore
 }
 
-// InitConfig
+// InitConfig :
 func (c *Config) InitConfig(config *store.ConfigStore) {
 	c.config = config
 
