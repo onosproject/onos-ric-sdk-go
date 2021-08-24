@@ -11,6 +11,7 @@ import (
 	pb "github.com/openconfig/gnmi/proto/gnmi"
 )
 
+// Set :
 func (c *Config) Set(req configurable.SetRequest) (configurable.SetResponse, error) {
 	log.Debugf("Set Callback is called for:%+v", req)
 	var results []*pb.UpdateResult

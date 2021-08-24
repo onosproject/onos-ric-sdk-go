@@ -20,6 +20,7 @@ type EventBus struct {
 	rm       sync.RWMutex
 }
 
+// ConfigTreeWatcher :
 type ConfigTreeWatcher struct {
 	id uuid.UUID
 	ch chan event.Event

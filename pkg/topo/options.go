@@ -11,13 +11,16 @@ import (
 )
 
 const (
+	// DefaultServicePort :
 	DefaultServicePort = 5150
+
+	// DefaultServiceHost :
 	DefaultServiceHost = "onos-topo"
 )
 
 // Options topo SDK options
 type Options struct {
-	// Service service options
+	// Service is the service options
 	Service ServiceOptions
 }
 

@@ -10,10 +10,14 @@ import (
 
 const defaultServicePort = 5150
 
+// Encoding :
 type Encoding int
 
 const (
+	// ProtoEncoding protobuf
 	ProtoEncoding Encoding = iota
+
+	// ASN1Encoding asn1
 	ASN1Encoding
 )
 

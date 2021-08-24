@@ -26,6 +26,7 @@ func buildUpdate(b []byte, path *pb.Path, valType string) *pb.Update {
 	return update
 }
 
+// Get :
 func (c *Config) Get(req configurable.GetRequest) (configurable.GetResponse, error) {
 	log.Debugf("Get Callback is called for:%+v", req)
 	notifications := make([]*pb.Notification, len(req.Paths))

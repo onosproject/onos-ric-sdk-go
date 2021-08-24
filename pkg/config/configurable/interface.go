@@ -8,7 +8,7 @@ import (
 	"github.com/openconfig/gnmi/proto/gnmi"
 )
 
-// GetRequest
+// GetRequest :
 type GetRequest struct {
 	Paths        []*gnmi.Path
 	Prefix       *gnmi.Path
@@ -16,12 +16,12 @@ type GetRequest struct {
 	DataType     string
 }
 
-// GetResponse
+// GetResponse :
 type GetResponse struct {
 	Notifications []*gnmi.Notification
 }
 
-// SetRequest
+// SetRequest :
 type SetRequest struct {
 	DeletePaths  []*gnmi.Path
 	ReplacePaths []*gnmi.Update
@@ -29,7 +29,7 @@ type SetRequest struct {
 	Prefix       *gnmi.Path
 }
 
-// SetResponse
+// SetResponse :
 type SetResponse struct {
 	Results []*gnmi.UpdateResult
 }

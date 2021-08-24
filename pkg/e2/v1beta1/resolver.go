@@ -25,15 +25,18 @@ func newResolver(nodeID NodeID, opts Options) resolver.Builder {
 	}
 }
 
+// ResolverBuilder :
 type ResolverBuilder struct {
 	nodeID NodeID
 	opts   Options
 }
 
+// Scheme :
 func (b *ResolverBuilder) Scheme() string {
 	return resolverName
 }
 
+// Build :
 func (b *ResolverBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
 	var dialOpts []grpc.DialOption
 	if opts.DialCreds != nil {
@@ -74,6 +77,7 @@ func (b *ResolverBuilder) Build(target resolver.Target, cc resolver.ClientConn, 
 
 var _ resolver.Builder = (*ResolverBuilder)(nil)
 
+// Resolver :
 type Resolver struct {
 	nodeID        NodeID
 	clientConn    resolver.ClientConn
@@ -184,8 +188,10 @@ func (r *Resolver) updateState() {
 	})
 }
 
+// ResolveNow :
 func (r *Resolver) ResolveNow(resolver.ResolveNowOptions) {}
 
+// Close :
 func (r *Resolver) Close() {
 	if err := r.resolverConn.Close(); err != nil {
 		log.Error("failed to close conn", err)

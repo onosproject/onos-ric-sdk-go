@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-// Package gnmi implements a gnmi server to mock a device with YANG models.
+// Package agent implements a gnmi server to mock a device with YANG models.
 package agent
 
 import (
@@ -21,6 +21,7 @@ func NewService(configurable configurable.Configurable) GnmiService {
 	return newService(configurable)
 }
 
+// GnmiService :
 type GnmiService interface {
 	northbound.Service
 }
@@ -47,4 +48,5 @@ func (s *Service) Register(r *grpc.Server) {
 	reflection.Register(r)
 }
 
+// GnmiService :
 var _ GnmiService = &Service{}

@@ -8,10 +8,14 @@ package encoding
 type Type int32
 
 const (
+	// ASN1 :
 	ASN1 Type = iota
+
+	// PROTO :
 	PROTO
 )
 
+// String :
 func (t Type) String() string {
 	return [...]string{"ASN.1", "PROTO"}[t]
 }
