@@ -6,6 +6,7 @@ package e2
 
 import (
 	"fmt"
+	"time"
 )
 
 const defaultServicePort = 5150
@@ -24,6 +25,11 @@ const (
 // Option is an E2 client option
 type Option interface {
 	apply(*Options)
+}
+
+// SubscribeOption is an option for subscribe request
+type SubscribeOption interface {
+	apply(*SubscribeOptions)
 }
 
 // EmptyOption is an empty client option
@@ -67,6 +73,12 @@ type ServiceOptions struct {
 	Port int
 }
 
+// SubscribeOptions are the options for a subscription
+type SubscribeOptions struct {
+	// Port is the service port
+	TransactionTimeout time.Duration
+}
+
 // GetHost gets the service host
 func (o ServiceOptions) GetHost() string {
 	return o.Host
@@ -98,6 +110,20 @@ type ServiceModelOptions struct {
 
 	// Version is the service model version
 	Version ServiceModelVersion
+}
+
+type funcSubscribeOption struct {
+	f func(*SubscribeOptions)
+}
+
+func (f funcSubscribeOption) apply(options *SubscribeOptions) {
+	f.f(options)
+}
+
+func newSubscribeOption(f func(*SubscribeOptions)) SubscribeOption {
+	return funcSubscribeOption{
+		f: f,
+	}
 }
 
 type funcOption struct {
@@ -181,5 +207,12 @@ func WithE2THost(host string) Option {
 func WithE2TPort(port int) Option {
 	return newOption(func(options *Options) {
 		options.Service.Port = port
+	})
+}
+
+// WithSubscriptionTransactionTimeout sets a timeout value for subscriptions
+func WithSubscriptionTransactionTimeout(transactionTimeout time.Duration) SubscribeOption {
+	return newSubscribeOption(func(options *SubscribeOptions) {
+		options.TransactionTimeout = transactionTimeout
 	})
 }
