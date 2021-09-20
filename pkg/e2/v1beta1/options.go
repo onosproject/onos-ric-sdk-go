@@ -27,6 +27,11 @@ type Option interface {
 	apply(*Options)
 }
 
+// SubscribeOption is an option for subscribe request
+type SubscribeOption interface {
+	apply(*SubscribeOptions)
+}
+
 // EmptyOption is an empty client option
 type EmptyOption struct{}
 
@@ -42,8 +47,6 @@ type Options struct {
 	Service ServiceOptions
 	// Topo is the topology service configuration
 	Topo ServiceOptions
-	// Subscribe is the subscription configuration
-	Subscribe SubscribeOptions
 	// Encoding is the default encoding
 	Encoding Encoding
 }
@@ -107,6 +110,20 @@ type ServiceModelOptions struct {
 
 	// Version is the service model version
 	Version ServiceModelVersion
+}
+
+type funcSubscribeOption struct {
+	f func(*SubscribeOptions)
+}
+
+func (f funcSubscribeOption) apply(options *SubscribeOptions) {
+	f.f(options)
+}
+
+func newSubscribeOption(f func(*SubscribeOptions)) SubscribeOption {
+	return funcSubscribeOption{
+		f: f,
+	}
 }
 
 type funcOption struct {
@@ -194,8 +211,8 @@ func WithE2TPort(port int) Option {
 }
 
 // WithSubscriptionTimeout sets a timeout value for subscriptions
-func WithSubscriptionTimeout(timeout time.Duration) Option {
-	return newOption(func(options *Options) {
-		options.Subscribe.Timeout = timeout
+func WithSubscriptionTimeout(timeout time.Duration) SubscribeOption {
+	return newSubscribeOption(func(options *SubscribeOptions) {
+		options.Timeout = timeout
 	})
 }
