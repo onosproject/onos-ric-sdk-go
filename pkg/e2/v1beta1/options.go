@@ -76,7 +76,7 @@ type ServiceOptions struct {
 // SubscribeOptions are the options for a subscription
 type SubscribeOptions struct {
 	// Port is the service port
-	Timeout time.Duration
+	TransactionTimeout time.Duration
 }
 
 // GetHost gets the service host
@@ -210,9 +210,9 @@ func WithE2TPort(port int) Option {
 	})
 }
 
-// WithSubscriptionTimeout sets a timeout value for subscriptions
-func WithSubscriptionTimeout(timeout time.Duration) SubscribeOption {
+// WithSubscriptionTransactionTimeout sets a timeout value for subscriptions
+func WithSubscriptionTransactionTimeout(transactionTimeout time.Duration) SubscribeOption {
 	return newSubscribeOption(func(options *SubscribeOptions) {
-		options.Timeout = timeout
+		options.TransactionTimeout = transactionTimeout
 	})
 }

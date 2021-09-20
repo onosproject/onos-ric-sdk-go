@@ -175,7 +175,7 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 	}
 	client := e2api.NewSubscriptionServiceClient(conn)
 
-	options := SubscribeOptions{Timeout: 2 * time.Minute}
+	options := SubscribeOptions{TransactionTimeout: 2 * time.Minute}
 	for _, opt := range opts {
 		opt.apply(&options)
 	}
@@ -184,7 +184,7 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 		Headers:            n.getRequestHeaders(),
 		TransactionID:      e2api.TransactionID(name),
 		Subscription:       sub,
-		TransactionTimeout: &options.Timeout,
+		TransactionTimeout: &options.TransactionTimeout,
 	}
 	log.Debugf("Sending SubscribeRequest %+v", request)
 	stream, err := client.Subscribe(ctx, request)
