@@ -210,8 +210,8 @@ func WithE2TPort(port int) Option {
 	})
 }
 
-// WithSubscriptionTransactionTimeout sets a timeout value for subscriptions
-func WithSubscriptionTransactionTimeout(transactionTimeout time.Duration) SubscribeOption {
+// WithTransactionTimeout sets a timeout value for subscriptions
+func WithTransactionTimeout(transactionTimeout time.Duration) SubscribeOption {
 	return newSubscribeOption(func(options *SubscribeOptions) {
 		options.TransactionTimeout = transactionTimeout
 	})
