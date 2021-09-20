@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 	e2api "github.com/onosproject/onos-api/go/onos/e2t/e2/v1beta1"
@@ -36,7 +37,7 @@ type Node interface {
 	// to the given channel.
 	// If the subscription is successful, a subscription.Context will be returned. The subscription
 	// context can be used to cancel the subscription by calling Close() on the subscription.Context.
-	Subscribe(ctx context.Context, name string, sub e2api.SubscriptionSpec, indCh chan<- e2api.Indication) (e2api.ChannelID, error)
+	Subscribe(ctx context.Context, name string, sub e2api.SubscriptionSpec, indCh chan<- e2api.Indication, opts ...Option) (e2api.ChannelID, error)
 
 	// Unsubscribe unsubscribes from the given subscription
 	Unsubscribe(ctx context.Context, name string) error
@@ -60,7 +61,8 @@ func NewNode(nodeID NodeID, opts ...Option) Node {
 			Host: "onos-topo",
 			Port: defaultServicePort,
 		},
-		Encoding: ProtoEncoding,
+		Encoding:  ProtoEncoding,
+		Subscribe: SubscribeOptions{Timeout: 2 * time.Minute},
 	}
 	for _, opt := range opts {
 		opt.apply(&options)
@@ -168,17 +170,23 @@ func (n *e2Node) Control(ctx context.Context, message *e2api.ControlMessage) (*e
 	return &response.Outcome, nil
 }
 
-func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.SubscriptionSpec, indCh chan<- e2api.Indication) (e2api.ChannelID, error) {
+func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.SubscriptionSpec, indCh chan<- e2api.Indication, opts ...Option) (e2api.ChannelID, error) {
 	conn, err := n.connect(ctx)
 	if err != nil {
 		return "", err
 	}
 	client := e2api.NewSubscriptionServiceClient(conn)
 
+	options := Options{}
+	for _, opt := range opts {
+		opt.apply(&options)
+	}
+
 	request := &e2api.SubscribeRequest{
-		Headers:       n.getRequestHeaders(),
-		TransactionID: e2api.TransactionID(name),
-		Subscription:  sub,
+		Headers:            n.getRequestHeaders(),
+		TransactionID:      e2api.TransactionID(name),
+		Subscription:       sub,
+		TransactionTimeout: &options.Subscribe.Timeout,
 	}
 	log.Debugf("Sending SubscribeRequest %+v", request)
 	stream, err := client.Subscribe(ctx, request)

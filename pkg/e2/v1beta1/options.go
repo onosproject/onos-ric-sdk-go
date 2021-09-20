@@ -6,6 +6,7 @@ package e2
 
 import (
 	"fmt"
+	"time"
 )
 
 const defaultServicePort = 5150
@@ -41,6 +42,8 @@ type Options struct {
 	Service ServiceOptions
 	// Topo is the topology service configuration
 	Topo ServiceOptions
+	// Subscribe is the subscription configuration
+	Subscribe SubscribeOptions
 	// Encoding is the default encoding
 	Encoding Encoding
 }
@@ -65,6 +68,12 @@ type ServiceOptions struct {
 	Host string
 	// Port is the service port
 	Port int
+}
+
+// SubscribeOptions are the options for a subscription
+type SubscribeOptions struct {
+	// Port is the service port
+	Timeout time.Duration
 }
 
 // GetHost gets the service host
@@ -181,5 +190,12 @@ func WithE2THost(host string) Option {
 func WithE2TPort(port int) Option {
 	return newOption(func(options *Options) {
 		options.Service.Port = port
+	})
+}
+
+// WithSubscriptionTimeout sets a timeout value for subscriptions
+func WithSubscriptionTimeout(timeout time.Duration) Option {
+	return newOption(func(options *Options) {
+		options.Subscribe.Timeout = timeout
 	})
 }
