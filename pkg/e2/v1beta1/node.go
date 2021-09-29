@@ -111,15 +111,6 @@ func (n *e2Node) connect(ctx context.Context) (*grpc.ClientConn, error) {
 		return n.conn, nil
 	}
 
-	/*
-		clientCreds, _ := creds.GetClientCredentials()
-		conn, err := grpc.DialContext(ctx, fmt.Sprintf("%s:///%s", resolverName, n.options.Service.GetAddress()),
-			grpc.WithResolvers(newResolver(n.nodeID, n.options)),
-			grpc.WithTransportCredentials(credentials.NewTLS(clientCreds)),
-			grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor()),
-			grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor()))
-	*/
-	log.Info("Connecting...")
 	clientCreds, _ := creds.GetClientCredentials()
 	conn, err := grpc.DialContext(ctx, "localhost:5151",
 		grpc.WithTransportCredentials(credentials.NewTLS(clientCreds)),
@@ -128,7 +119,6 @@ func (n *e2Node) connect(ctx context.Context) (*grpc.ClientConn, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Infof("Connected: %+v", conn)
 	n.conn = conn
 	return conn, nil
 }
