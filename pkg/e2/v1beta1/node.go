@@ -12,9 +12,11 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/env"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/grpc/retry"
+	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/creds"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/v1beta1/e2errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 	"io"
 	"sync"
@@ -116,7 +118,9 @@ func (n *e2Node) connect(ctx context.Context) (*grpc.ClientConn, error) {
 			grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor()))
 	*/
 	log.Info("Connecting...")
-	conn, err := grpc.DialContext(ctx, "localhost:5151", grpc.WithInsecure(),
+	clientCreds, _ := creds.GetClientCredentials()
+	conn, err := grpc.DialContext(ctx, "localhost:5151",
+		grpc.WithTransportCredentials(credentials.NewTLS(clientCreds)),
 		grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor(retry.WithRetryOn(codes.Unavailable))),
 		grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor()))
 	if err != nil {
