@@ -47,6 +47,8 @@ type Node interface {
 	Control(ctx context.Context, message *e2api.ControlMessage) (*e2api.ControlOutcome, error)
 }
 
+const e2NodeIDHeader = "e2-node-id"
+
 // NewNode creates a new E2 Node with the given ID
 func NewNode(nodeID NodeID, opts ...Option) Node {
 	options := Options{
@@ -169,15 +171,14 @@ func (n *e2Node) Control(ctx context.Context, message *e2api.ControlMessage) (*e
 		Headers: n.getRequestHeaders(),
 		Message: *message,
 	}
-	log.Infof("Sending ControlRequest %+v", request)
-	ctx = metadata.AppendToOutgoingContext(ctx, "E2-Node-ID", string(n.nodeID))
-	log.Infof("Annotating context: %+v", ctx)
+	log.Debugf("Sending ControlRequest %+v", request)
+	ctx = metadata.AppendToOutgoingContext(ctx, e2NodeIDHeader, string(n.nodeID))
 	response, err := client.Control(ctx, request)
 	if err != nil {
 		log.Warnf("ControlRequest %+v failed: %v", request, err)
 		return nil, getErrorFromGRPC(err)
 	}
-	log.Infof("Received ControlResponse %+v", response)
+	log.Debugf("Received ControlResponse %+v", response)
 	return &response.Outcome, nil
 }
 
@@ -199,11 +200,9 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 		Subscription:       sub,
 		TransactionTimeout: &options.TransactionTimeout,
 	}
-	log.Infof("Sending SubscribeRequest %+v", request)
-	ctx = metadata.AppendToOutgoingContext(ctx, "E2-Node-ID", string(n.nodeID))
-	log.Infof("Annotating context: %+v", ctx)
+	log.Debugf("Sending SubscribeRequest %+v", request)
+	ctx = metadata.AppendToOutgoingContext(ctx, e2NodeIDHeader, string(n.nodeID))
 	stream, err := client.Subscribe(ctx, request)
-	log.Infof("Received stream response: %+v", stream, err)
 	if err != nil {
 		defer close(indCh)
 		return "", getErrorFromGRPC(err)
@@ -242,7 +241,7 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 					break
 				}
 			} else {
-				log.Infof("Received SubscribeResponse %+v", response)
+				log.Debugf("Received SubscribeResponse %+v", response)
 				switch m := response.Message.(type) {
 				case *e2api.SubscribeResponse_Ack:
 					channelID = m.Ack.ChannelID
@@ -283,7 +282,7 @@ func (n *e2Node) Unsubscribe(ctx context.Context, name string) error {
 		TransactionID: e2api.TransactionID(name),
 	}
 	log.Debugf("Sending UnsubscribeRequest %+v", request)
-	ctx = metadata.AppendToOutgoingContext(ctx, "E2-Node-ID", string(n.nodeID))
+	ctx = metadata.AppendToOutgoingContext(ctx, e2NodeIDHeader, string(n.nodeID))
 	response, err := client.Unsubscribe(ctx, request)
 	if err != nil {
 		log.Warnf("UnsubscribeRequest %+v failed: %v", request, err)
