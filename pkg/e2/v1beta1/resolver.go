@@ -18,12 +18,14 @@ import (
 
 const resolverName = "e2"
 
+/*
 func newResolver(nodeID NodeID, opts Options) resolver.Builder {
 	return &ResolverBuilder{
 		nodeID: nodeID,
 		opts:   opts,
 	}
 }
+*/
 
 // ResolverBuilder :
 type ResolverBuilder struct {

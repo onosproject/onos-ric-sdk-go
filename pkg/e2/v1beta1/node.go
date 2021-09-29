@@ -13,9 +13,9 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/grpc/retry"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/v1beta1/e2errors"
-	"github.com/onosproject/onos-ric-sdk-go/pkg/utils/creds"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"io"
 	"sync"
 	"time"
@@ -107,11 +107,16 @@ func (n *e2Node) connect(ctx context.Context) (*grpc.ClientConn, error) {
 		return n.conn, nil
 	}
 
-	clientCreds, _ := creds.GetClientCredentials()
-	conn, err := grpc.DialContext(ctx, fmt.Sprintf("%s:///%s", resolverName, n.options.Service.GetAddress()),
-		grpc.WithResolvers(newResolver(n.nodeID, n.options)),
-		grpc.WithTransportCredentials(credentials.NewTLS(clientCreds)),
-		grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor()),
+	/*
+		clientCreds, _ := creds.GetClientCredentials()
+		conn, err := grpc.DialContext(ctx, fmt.Sprintf("%s:///%s", resolverName, n.options.Service.GetAddress()),
+			grpc.WithResolvers(newResolver(n.nodeID, n.options)),
+			grpc.WithTransportCredentials(credentials.NewTLS(clientCreds)),
+			grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor()),
+			grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor()))
+	*/
+	conn, err := grpc.DialContext(ctx, "localhost:5151", grpc.WithInsecure(),
+		grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor(retry.WithRetryOn(codes.Unavailable))),
 		grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor()))
 	if err != nil {
 		return nil, err
@@ -158,13 +163,14 @@ func (n *e2Node) Control(ctx context.Context, message *e2api.ControlMessage) (*e
 		Headers: n.getRequestHeaders(),
 		Message: *message,
 	}
-	log.Debugf("Sending ControlRequest %+v", request)
+	log.Infof("Sending ControlRequest %+v", request)
+	ctx = metadata.AppendToOutgoingContext(ctx, "E2-Node-ID", string(n.nodeID))
 	response, err := client.Control(ctx, request)
 	if err != nil {
 		log.Warnf("ControlRequest %+v failed: %v", request, err)
 		return nil, getErrorFromGRPC(err)
 	}
-	log.Debugf("Received ControlResponse %+v", response)
+	log.Infof("Received ControlResponse %+v", response)
 	return &response.Outcome, nil
 }
 
@@ -187,6 +193,7 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 		TransactionTimeout: &options.TransactionTimeout,
 	}
 	log.Debugf("Sending SubscribeRequest %+v", request)
+	ctx = metadata.AppendToOutgoingContext(ctx, "E2-Node-ID", string(n.nodeID))
 	stream, err := client.Subscribe(ctx, request)
 	if err != nil {
 		defer close(indCh)
@@ -267,6 +274,7 @@ func (n *e2Node) Unsubscribe(ctx context.Context, name string) error {
 		TransactionID: e2api.TransactionID(name),
 	}
 	log.Debugf("Sending UnsubscribeRequest %+v", request)
+	ctx = metadata.AppendToOutgoingContext(ctx, "E2-Node-ID", string(n.nodeID))
 	response, err := client.Unsubscribe(ctx, request)
 	if err != nil {
 		log.Warnf("UnsubscribeRequest %+v failed: %v", request, err)

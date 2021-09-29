@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	balancer.Register(base.NewBalancerBuilder(resolverName, &PickerBuilder{}, base.Config{}))
+	//balancer.Register(base.NewBalancerBuilder(resolverName, &PickerBuilder{}, base.Config{}))
 }
 
 // PickerBuilder :
