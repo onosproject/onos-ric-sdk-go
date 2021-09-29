@@ -115,12 +115,14 @@ func (n *e2Node) connect(ctx context.Context) (*grpc.ClientConn, error) {
 			grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor()),
 			grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor()))
 	*/
+	log.Info("Connecting...")
 	conn, err := grpc.DialContext(ctx, "localhost:5151", grpc.WithInsecure(),
 		grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor(retry.WithRetryOn(codes.Unavailable))),
 		grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor()))
 	if err != nil {
 		return nil, err
 	}
+	log.Infof("Connected: %+v", conn)
 	n.conn = conn
 	return conn, nil
 }
@@ -165,6 +167,7 @@ func (n *e2Node) Control(ctx context.Context, message *e2api.ControlMessage) (*e
 	}
 	log.Infof("Sending ControlRequest %+v", request)
 	ctx = metadata.AppendToOutgoingContext(ctx, "E2-Node-ID", string(n.nodeID))
+	log.Infof("Annotating context: %+v", ctx)
 	response, err := client.Control(ctx, request)
 	if err != nil {
 		log.Warnf("ControlRequest %+v failed: %v", request, err)
@@ -192,9 +195,11 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 		Subscription:       sub,
 		TransactionTimeout: &options.TransactionTimeout,
 	}
-	log.Debugf("Sending SubscribeRequest %+v", request)
+	log.Infof("Sending SubscribeRequest %+v", request)
 	ctx = metadata.AppendToOutgoingContext(ctx, "E2-Node-ID", string(n.nodeID))
+	log.Infof("Annotating context: %+v", ctx)
 	stream, err := client.Subscribe(ctx, request)
+	log.Infof("Received stream response: %+v", stream, err)
 	if err != nil {
 		defer close(indCh)
 		return "", getErrorFromGRPC(err)
@@ -233,7 +238,7 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 					break
 				}
 			} else {
-				log.Debugf("Received SubscribeResponse %+v", response)
+				log.Infof("Received SubscribeResponse %+v", response)
 				switch m := response.Message.(type) {
 				case *e2api.SubscribeResponse_Ack:
 					channelID = m.Ack.ChannelID
