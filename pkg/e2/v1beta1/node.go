@@ -12,10 +12,12 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/env"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/grpc/retry"
+	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/creds"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/v1beta1/e2errors"
-	"github.com/onosproject/onos-ric-sdk-go/pkg/utils/creds"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/metadata"
 	"io"
 	"sync"
 	"time"
@@ -44,6 +46,8 @@ type Node interface {
 	// Control creates and sends a E2 control message and awaits the outcome
 	Control(ctx context.Context, message *e2api.ControlMessage) (*e2api.ControlOutcome, error)
 }
+
+const e2NodeIDHeader = "e2-node-id"
 
 // NewNode creates a new E2 Node with the given ID
 func NewNode(nodeID NodeID, opts ...Option) Node {
@@ -108,10 +112,9 @@ func (n *e2Node) connect(ctx context.Context) (*grpc.ClientConn, error) {
 	}
 
 	clientCreds, _ := creds.GetClientCredentials()
-	conn, err := grpc.DialContext(ctx, fmt.Sprintf("%s:///%s", resolverName, n.options.Service.GetAddress()),
-		grpc.WithResolvers(newResolver(n.nodeID, n.options)),
+	conn, err := grpc.DialContext(ctx, "localhost:5151",
 		grpc.WithTransportCredentials(credentials.NewTLS(clientCreds)),
-		grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor()),
+		grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor(retry.WithRetryOn(codes.Unavailable))),
 		grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor()))
 	if err != nil {
 		return nil, err
@@ -159,6 +162,7 @@ func (n *e2Node) Control(ctx context.Context, message *e2api.ControlMessage) (*e
 		Message: *message,
 	}
 	log.Debugf("Sending ControlRequest %+v", request)
+	ctx = metadata.AppendToOutgoingContext(ctx, e2NodeIDHeader, string(n.nodeID))
 	response, err := client.Control(ctx, request)
 	if err != nil {
 		log.Warnf("ControlRequest %+v failed: %v", request, err)
@@ -187,6 +191,7 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 		TransactionTimeout: &options.TransactionTimeout,
 	}
 	log.Debugf("Sending SubscribeRequest %+v", request)
+	ctx = metadata.AppendToOutgoingContext(ctx, e2NodeIDHeader, string(n.nodeID))
 	stream, err := client.Subscribe(ctx, request)
 	if err != nil {
 		defer close(indCh)
@@ -267,6 +272,7 @@ func (n *e2Node) Unsubscribe(ctx context.Context, name string) error {
 		TransactionID: e2api.TransactionID(name),
 	}
 	log.Debugf("Sending UnsubscribeRequest %+v", request)
+	ctx = metadata.AppendToOutgoingContext(ctx, e2NodeIDHeader, string(n.nodeID))
 	response, err := client.Unsubscribe(ctx, request)
 	if err != nil {
 		log.Warnf("UnsubscribeRequest %+v failed: %v", request, err)
