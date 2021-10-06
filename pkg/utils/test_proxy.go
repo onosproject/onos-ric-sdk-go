@@ -7,6 +7,7 @@ package utils
 import (
 	"fmt"
 	"github.com/onosproject/onos-lib-go/pkg/certs"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/onos-proxy/pkg/manager"
 	"io/ioutil"
 	"os"
@@ -32,6 +33,8 @@ func StartTestProxy() {
 		CertPath: crtFile,
 		GRPCPort: 5151,
 	}
+
+	logging.GetLogger("e2", "v1beta1").SetLevel(logging.WarnLevel)
 	mgr := manager.NewManager(cfg)
 	mgr.Run()
 }
