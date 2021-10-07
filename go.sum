@@ -254,10 +254,8 @@ github.com/onosproject/onos-api/go v0.7.95 h1:jfWSf7XUILDpPQDbRSQAgNnomGqzPoyoSA
 github.com/onosproject/onos-api/go v0.7.95/go.mod h1:CaFf0659DTSP/8LAwuKv9p9/xFPcx7fmcxC/dlSi8qo=
 github.com/onosproject/onos-lib-go v0.7.19 h1:FkkA86lQxLQmQjK8d/zvIUmr58jKBNXEPafVZ4sVe40=
 github.com/onosproject/onos-lib-go v0.7.19/go.mod h1:6Cm9H/aqJqJef2za3K3Lx6UrCrtOD7tN+DCThFOHcA8=
-github.com/onosproject/onos-proxy v0.0.1 h1:Djcl30r+nyN8bxCuYKhVgUQJTFtYhQj5Qy/a/qmrW2w=
-github.com/onosproject/onos-proxy v0.0.1/go.mod h1:yxaYxvuiOQisezdlpTPR30sJpS2QaQVTDW6tk/UPJQQ=
-github.com/onosproject/onos-proxy v0.0.2 h1:ThjG3rdbELsl8PPIbipltpCIg+6C80VYKM63PsIORSk=
-github.com/onosproject/onos-proxy v0.0.2/go.mod h1:yxaYxvuiOQisezdlpTPR30sJpS2QaQVTDW6tk/UPJQQ=
+github.com/onosproject/onos-proxy v0.0.3 h1:B8wv4rQhdl608J51XYoLxtmHduwqWfOY5DLLkU5h04o=
+github.com/onosproject/onos-proxy v0.0.3/go.mod h1:yxaYxvuiOQisezdlpTPR30sJpS2QaQVTDW6tk/UPJQQ=
 github.com/openconfig/gnmi v0.0.0-20200617225440-d2b4e6a45802 h1:WXFwJlWOJINlwlyAZuNo4GdYZS6qPX36+rRUncLmN8Q=
 github.com/openconfig/gnmi v0.0.0-20200617225440-d2b4e6a45802/go.mod h1:M/EcuapNQgvzxo1DDXHK4tx3QpYM/uG4l591v33jG2A=
 github.com/openconfig/goyang v0.0.0-20200115183954-d0a48929f0ea/go.mod h1:dhXaV0JgHJzdrHi2l+w0fZrwArtXL7jEFoiqLEdmkvU=
