@@ -11,7 +11,7 @@ import (
 	e2api "github.com/onosproject/onos-api/go/onos/e2t/e2/v1beta1"
 	"github.com/onosproject/onos-lib-go/pkg/env"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
-	"github.com/onosproject/onos-proxy/pkg/e2/v1beta1/retry"
+	"github.com/onosproject/onos-lib-go/pkg/grpc/retry"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/creds"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/v1beta1/e2errors"
 	"google.golang.org/grpc"
