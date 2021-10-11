@@ -36,7 +36,7 @@ golang-ci: # @HELP install golang-ci if not present
 
 license_check: build-tools # @HELP examine and ensure license headers exist
 	@if [ ! -d "../build-tools" ]; then cd .. && git clone https://github.com/onosproject/build-tools.git; fi
-	./../build-tools/licensing/boilerplate.py -v --rootdir=${CURDIR} --boilerplate LicenseRef-ONF-Member-1.0
+	./../build-tools/licensing/boilerplate.py -v --rootdir=${CURDIR} --boilerplate LicenseRef-ONF-Member-Only-1.0
 
 publish: # @HELP publish version on github and dockerhub
 	./../build-tools/publish-version ${VERSION}
