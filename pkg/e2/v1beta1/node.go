@@ -115,7 +115,7 @@ func (n *e2Node) connect(ctx context.Context) (*grpc.ClientConn, error) {
 	conn, err := grpc.DialContext(ctx, "localhost:5151",
 		grpc.WithTransportCredentials(credentials.NewTLS(clientCreds)),
 		grpc.WithUnaryInterceptor(retry.RetryingUnaryClientInterceptor(retry.WithRetryOn(codes.Unavailable))),
-		grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor()))
+		grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor(retry.WithRetryOn(codes.Unavailable))))
 	if err != nil {
 		return nil, err
 	}
@@ -216,15 +216,9 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 				}
 
 				log.Warnf("SubscribeRequest %+v failed: %v", request, err)
-				channelID := e2api.ChannelID("")
-				ack := response.GetAck()
-				if ack != nil {
-					channelID = ack.ChannelID
-				}
 				if !acked {
 					ackCh <- ackResult{
-						err:       err,
-						channelID: channelID,
+						err: err,
 					}
 					close(ackCh)
 					acked = true
