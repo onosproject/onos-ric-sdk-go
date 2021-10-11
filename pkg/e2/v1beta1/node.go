@@ -17,7 +17,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/metadata"
 	"io"
 	"sync"
 	"time"
@@ -46,8 +45,6 @@ type Node interface {
 	// Control creates and sends a E2 control message and awaits the outcome
 	Control(ctx context.Context, message *e2api.ControlMessage) (*e2api.ControlOutcome, error)
 }
-
-const e2NodeIDHeader = "e2-node-id"
 
 // NewNode creates a new E2 Node with the given ID
 func NewNode(nodeID NodeID, opts ...Option) Node {
@@ -162,7 +159,6 @@ func (n *e2Node) Control(ctx context.Context, message *e2api.ControlMessage) (*e
 		Message: *message,
 	}
 	log.Debugf("Sending ControlRequest %+v", request)
-	ctx = metadata.AppendToOutgoingContext(ctx, e2NodeIDHeader, string(n.nodeID))
 	response, err := client.Control(ctx, request)
 	if err != nil {
 		log.Warnf("ControlRequest %+v failed: %v", request, err)
@@ -191,7 +187,6 @@ func (n *e2Node) Subscribe(ctx context.Context, name string, sub e2api.Subscript
 		TransactionTimeout: &options.TransactionTimeout,
 	}
 	log.Debugf("Sending SubscribeRequest %+v", request)
-	ctx = metadata.AppendToOutgoingContext(ctx, e2NodeIDHeader, string(n.nodeID))
 	stream, err := client.Subscribe(ctx, request)
 	if err != nil {
 		defer close(indCh)
@@ -266,7 +261,6 @@ func (n *e2Node) Unsubscribe(ctx context.Context, name string) error {
 		TransactionID: e2api.TransactionID(name),
 	}
 	log.Debugf("Sending UnsubscribeRequest %+v", request)
-	ctx = metadata.AppendToOutgoingContext(ctx, e2NodeIDHeader, string(n.nodeID))
 	response, err := client.Unsubscribe(ctx, request)
 	if err != nil {
 		log.Warnf("UnsubscribeRequest %+v failed: %v", request, err)
