@@ -10,6 +10,7 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/uri"
 )
 
+// GetXappTopoID creates a Xapp topo ID
 func GetXappTopoID() topoapi.ID {
 	return topoapi.ID(uri.NewURI(
 		uri.WithScheme("a1"),

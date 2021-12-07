@@ -4,18 +4,20 @@
 
 package a1endpoint
 
+// NewServer creates a new server struct
 func NewServer(caPath string, keyPath string, certPath string, grpcPort int) Server {
 	return Server{
-		CAPath: caPath,
-		KeyPath: keyPath,
+		CAPath:   caPath,
+		KeyPath:  keyPath,
 		CertPath: certPath,
 		GRPCPort: grpcPort,
 	}
 }
 
+// Server is a A1 server
 type Server struct {
-	CAPath string
-	KeyPath string
+	CAPath   string
+	KeyPath  string
 	CertPath string
 	GRPCPort int
 }
