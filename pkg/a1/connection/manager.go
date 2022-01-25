@@ -25,18 +25,18 @@ func NewManager(caPath string, keyPath string, certPath string, grpcPort int, a1
 		return nil, err
 	}
 	return &Manager{
-		id:         utils.GetXappTopoID(),
-		server:     a1endpoint.NewServer(caPath, keyPath, certPath, grpcPort),
-		topoClient: topoClient,
+		id:            utils.GetXappTopoID(),
+		server:        a1endpoint.NewServer(caPath, keyPath, certPath, grpcPort),
+		topoClient:    topoClient,
 		a1PolicyTypes: a1PolicyTypes,
 	}, nil
 }
 
 // Manager is a struct of A1 interface
 type Manager struct {
-	id         topoapi.ID
-	server     a1endpoint.Server
-	topoClient topo.Client
+	id            topoapi.ID
+	server        a1endpoint.Server
+	topoClient    topo.Client
 	a1PolicyTypes []*topoapi.A1PolicyType
 }
 
@@ -78,7 +78,7 @@ func (m *Manager) AddXAppElementOnTopo(ctx context.Context) error {
 	}
 
 	aspect := &topoapi.XAppInfo{
-		Interfaces: interfaces,
+		Interfaces:    interfaces,
 		A1PolicyTypes: m.a1PolicyTypes,
 	}
 
