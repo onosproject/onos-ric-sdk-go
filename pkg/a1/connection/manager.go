@@ -33,9 +33,9 @@ func NewManager(caPath string, keyPath string, certPath string, grpcPort int) (*
 
 // Manager is a struct of A1 interface
 type Manager struct {
-	id             topoapi.ID
-	server         a1endpoint.Server
-	topoClient     topo.Client
+	id         topoapi.ID
+	server     a1endpoint.Server
+	topoClient topo.Client
 }
 
 // Start inits and starts A1 server
