@@ -19,7 +19,7 @@ import (
 var log = logging.GetLogger("a1", "manager")
 
 // NewManager creates a new A1 manager
-func NewManager(caPath string, keyPath string, certPath string, grpcPort int) (*Manager, error) {
+func NewManager(caPath string, keyPath string, certPath string, grpcPort int, a1PolicyTypes []*topoapi.A1PolicyType) (*Manager, error) {
 	topoClient, err := topo.NewClient()
 	if err != nil {
 		return nil, err
@@ -28,6 +28,7 @@ func NewManager(caPath string, keyPath string, certPath string, grpcPort int) (*
 		id:         utils.GetXappTopoID(),
 		server:     a1endpoint.NewServer(caPath, keyPath, certPath, grpcPort),
 		topoClient: topoClient,
+		a1PolicyTypes: a1PolicyTypes,
 	}, nil
 }
 
@@ -36,6 +37,7 @@ type Manager struct {
 	id         topoapi.ID
 	server     a1endpoint.Server
 	topoClient topo.Client
+	a1PolicyTypes []*topoapi.A1PolicyType
 }
 
 // Start inits and starts A1 server
@@ -77,6 +79,7 @@ func (m *Manager) AddXAppElementOnTopo(ctx context.Context) error {
 
 	aspect := &topoapi.XAppInfo{
 		Interfaces: interfaces,
+		A1PolicyTypes: m.a1PolicyTypes,
 	}
 
 	err := object.SetAspect(aspect)
