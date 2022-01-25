@@ -19,7 +19,7 @@ import (
 var log = logging.GetLogger("a1", "manager")
 
 // NewManager creates a new A1 manager
-func NewManager(caPath string, keyPath string, certPath string, grpcPort int, xAppName string) (*Manager, error) {
+func NewManager(caPath string, keyPath string, certPath string, grpcPort int) (*Manager, error) {
 	topoClient, err := topo.NewClient()
 	if err != nil {
 		return nil, err
@@ -33,20 +33,20 @@ func NewManager(caPath string, keyPath string, certPath string, grpcPort int, xA
 
 // Manager is a struct of A1 interface
 type Manager struct {
-	id         topoapi.ID
-	server     a1endpoint.Server
-	topoClient topo.Client
+	id             topoapi.ID
+	server         a1endpoint.Server
+	topoClient     topo.Client
 }
 
 // Start inits and starts A1 server
 func (m *Manager) Start(ctx context.Context) {
 	go func(ctx context.Context) {
 		log.Infof("Start (or restart) A1 connection manager")
-		err := m.AddXappElementOnTopo(ctx)
+		err := m.AddXAppElementOnTopo(ctx)
 		if err != nil {
 			log.Warn(err)
+			log.Warn()
 		}
-		// ToDo: Add code to run A1 server here
 	}(ctx)
 }
 
@@ -55,8 +55,8 @@ func (m *Manager) GetID() topoapi.ID {
 	return m.id
 }
 
-// AddXappElementOnTopo adds XApp type on topo
-func (m *Manager) AddXappElementOnTopo(ctx context.Context) error {
+// AddXAppElementOnTopo adds XApp type on topo
+func (m *Manager) AddXAppElementOnTopo(ctx context.Context) error {
 	object := &topoapi.Object{
 		ID:   m.id,
 		Type: topoapi.Object_ENTITY,
@@ -83,10 +83,34 @@ func (m *Manager) AddXappElementOnTopo(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	err = m.topoClient.Create(ctx, object)
+	obj, err := m.topoClient.Get(ctx, m.id)
+	if err != nil {
+		err = m.topoClient.Create(ctx, object)
+		return err
+	}
+	log.Warn("Update topo A1 XApp entity to have the latest aspects since there is already exist")
+	err = obj.SetAspect(aspect)
+	if err != nil {
+		return err
+	}
+	err = m.topoClient.Update(ctx, obj)
+	return err
+}
+
+// DeleteXAppElementOnTopo removes all aspects on topo
+func (m *Manager) DeleteXAppElementOnTopo(ctx context.Context) error {
+	obj, err := m.topoClient.Get(ctx, m.id)
+	if err != nil {
+		return err
+	}
+	aspect := &topoapi.XAppInfo{}
+	err = obj.SetAspect(aspect)
+	if err != nil {
+		return err
+	}
+	err = m.topoClient.Update(ctx, obj)
 	if err != nil && !errors.IsAlreadyExists(err) {
 		return err
 	}
-
 	return nil
 }
