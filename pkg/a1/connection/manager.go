@@ -19,13 +19,13 @@ import (
 var log = logging.GetLogger("a1", "manager")
 
 // NewManager creates a new A1 manager
-func NewManager(caPath string, keyPath string, certPath string, grpcPort int, a1PolicyTypes []*topoapi.A1PolicyType) (*Manager, error) {
+func NewManager(caPath string, keyPath string, certPath string, grpcPort int, a1PolicyTypes []*topoapi.A1PolicyType, xAppName string) (*Manager, error) {
 	topoClient, err := topo.NewClient()
 	if err != nil {
 		return nil, err
 	}
 	return &Manager{
-		id:            utils.GetXappTopoID(),
+		id:            utils.GetXappTopoID(xAppName),
 		server:        a1endpoint.NewServer(caPath, keyPath, certPath, grpcPort),
 		topoClient:    topoClient,
 		a1PolicyTypes: a1PolicyTypes,
