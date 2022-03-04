@@ -6,12 +6,13 @@ package utils
 
 import (
 	topoapi "github.com/onosproject/onos-api/go/onos/topo"
+	"github.com/onosproject/onos-lib-go/pkg/env"
 	"github.com/onosproject/onos-lib-go/pkg/uri"
 )
 
 // GetXappTopoID creates a Xapp topo ID
-func GetXappTopoID(xAppName string) topoapi.ID {
+func GetXappTopoID() topoapi.ID {
 	return topoapi.ID(uri.NewURI(
 		uri.WithScheme("a1"),
-		uri.WithOpaque(xAppName)).String())
+		uri.WithOpaque(env.GetPodName())).String())
 }
