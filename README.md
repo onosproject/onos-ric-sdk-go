@@ -25,6 +25,7 @@ For the detail usage of each API, you can refer to the following links:
 
 [Topo API Usage](docs/topo.md)
 
+[A1 API Usage](docs/a1.md)
 
 [Go]: https://golang.org/
 [Go modules]: https://golang.org/ref/mod
