@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
+SPDX-License-Identifier: Apache-2.0
+-->
+
 ## Topo API
 The `github.com/onosproject/onos-ric-sdk-go/pkg/topo` provides a high level interface for applications to interact
 with [onos-topo] subsystem. The current interface allows applications to *Create*, *Update*, *Get*, and *List*  topology entities and their relations and *Watch* topology changes.
