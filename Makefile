@@ -22,12 +22,12 @@ mod-lint: mod-update # @HELP ensure that the required dependencies are in place
 	bash -c "diff -u <(echo -n) <(git diff go.sum)"
 
 test: # @HELP run the unit tests and source code validation
-test: deps linters license
+test: mod-lint linters license
 	go test github.com/onosproject/onos-ric-sdk-go/pkg/...
 
 jenkins-test:  # @HELP run the unit tests and source code validation producing a junit style report for Jenkins
-jenkins-test: deps linters license
-	TEST_PACKAGES=github.com/onosproject/onos-ric-sdk-go/... ./../build-tools/build/jenkins/make-unit
+jenkins-test: mod-lint linters license
+	TEST_PACKAGES=github.com/onosproject/onos-ric-sdk-go/pkg/... ./build/build-tools/build/jenkins/make-unit
 
 coverage: # @HELP generate unit test coverage data
 coverage: deps linters
