@@ -29,15 +29,11 @@ jenkins-test:  # @HELP run the unit tests and source code validation producing a
 jenkins-test: mod-lint linters license
 	TEST_PACKAGES=github.com/onosproject/onos-ric-sdk-go/pkg/... ./build/build-tools/build/jenkins/make-unit
 
-coverage: # @HELP generate unit test coverage data
-coverage: deps linters
-	# ./build/bin/coveralls-coverage
-
 publish: # @HELP publish version on github and dockerhub
-	./../build-tools/publish-version ${VERSION}
+	./build/build-tools/publish-version ${VERSION}
 
-jenkins-publish: build-tools jenkins-tools # @HELP Jenkins calls this to publish artifacts
-	../build-tools/release-merge-commit
+jenkins-publish: # @HELP Jenkins calls this to publish artifacts
+	./build/build-tools/release-merge-commit
 
 clean:: # @HELP remove all the build artifacts
 	rm -rf ./build/_output ./vendor
