@@ -49,11 +49,20 @@ func TestFactories(t *testing.T) {
 	assert.Equal(t, RICCallProcessIDInvalid, NewRICCallProcessIDInvalid("").(*TypedError).E2APType)
 	assert.Equal(t, "RICCallProcessIDInvalid", NewRICCallProcessIDInvalid("RICCallProcessIDInvalid").Error())
 
+	assert.Equal(t, RicControlTimerExpired, NewRICControlTimerExpired("").(*TypedError).E2APType)
+	assert.Equal(t, "RICControlTimerExpired", NewRICControlTimerExpired("RICControlTimerExpired").Error())
+
+	assert.Equal(t, RicControlFailedToExecute, NewRICControlFailedToExecute("").(*TypedError).E2APType)
+	assert.Equal(t, "RicControlFailedToExecute", NewRICControlFailedToExecute("RicControlFailedToExecute").Error())
+
+	assert.Equal(t, RICSystemNotReady, NewRICSystemNotReady("").(*TypedError).E2APType)
+	assert.Equal(t, "RICSystemNotReady", NewRICSystemNotReady("RICSystemNotReady").Error())
+
 	assert.Equal(t, RICServiceUnspecified, NewRICServiceUnspecified("").(*TypedError).E2APType)
 	assert.Equal(t, "RICServiceUnspecified", NewRICServiceUnspecified("RICServiceUnspecified").Error())
 
-	assert.Equal(t, RICServiceFunctionNotRequired, NewRICServiceFunctionNotRequired("").(*TypedError).E2APType)
-	assert.Equal(t, "RICServiceFunctionNotRequired", NewRICServiceFunctionNotRequired("RICServiceFunctionNotRequired").Error())
+	assert.Equal(t, RicServiceRANFunctionNotSupported, NewRICServiceRANFunctionNotSupported("").(*TypedError).E2APType)
+	assert.Equal(t, "RICServiceRANFunctionNotSupported", NewRICServiceRANFunctionNotSupported("RICServiceRANFunctionNotSupported").Error())
 
 	assert.Equal(t, RICServiceExcessiveFunctions, NewRICServiceExcessiveFunctions("").(*TypedError).E2APType)
 	assert.Equal(t, "RICServiceExcessiveFunctions", NewRICServiceExcessiveFunctions("RICServiceExcessiveFunctions").Error())
@@ -130,11 +139,20 @@ func TestPredicates(t *testing.T) {
 	assert.False(t, IsRICCallProcessIDInvalid(errors.New("RICCallProcessIDInvalid")))
 	assert.True(t, IsRICCallProcessIDInvalid(NewRICCallProcessIDInvalid("RICCallProcessIDInvalid")))
 
+	assert.False(t, IsRICControlTimerExpired(errors.New("RICControlTimerExpired")))
+	assert.True(t, IsRICControlTimerExpired(NewRICControlTimerExpired("RICControlTimerExpired")))
+
+	assert.False(t, IsRICControlFailedToExecute(errors.New("RICControlFailedToExecute")))
+	assert.True(t, IsRICControlFailedToExecute(NewRICControlFailedToExecute("RICControlFailedToExecute")))
+
+	assert.False(t, IsRICSystemNotReady(errors.New("RICSystemNotReady")))
+	assert.True(t, IsRICSystemNotReady(NewRICSystemNotReady("RICSystemNotReady")))
+
 	assert.False(t, IsRICServiceUnspecified(errors.New("RICServiceUnspecified")))
 	assert.True(t, IsRICServiceUnspecified(NewRICServiceUnspecified("RICServiceUnspecified")))
 
-	assert.False(t, IsRICServiceFunctionNotRequired(errors.New("RICServiceFunctionNotRequired")))
-	assert.True(t, IsRICServiceFunctionNotRequired(NewRICServiceFunctionNotRequired("RICServiceFunctionNotRequired")))
+	assert.False(t, IsRICServiceRANFunctionNotSupported(errors.New("RICServiceRANFunctionNotSupported")))
+	assert.True(t, IsRICServiceRANFunctionNotSupported(NewRICServiceRANFunctionNotSupported("RICServiceRANFunctionNotSupported")))
 
 	assert.False(t, IsRICServiceExcessiveFunctions(errors.New("RICServiceExcessiveFunctions")))
 	assert.True(t, IsRICServiceExcessiveFunctions(NewRICServiceExcessiveFunctions("RICServiceExcessiveFunctions")))
@@ -324,6 +342,45 @@ func TestGRPCToError(t *testing.T) {
 
 	e2apErr = &e2api.Error{
 		Cause: &e2api.Error_Cause{
+			Cause: &e2api.Error_Cause_Ric_{
+				Ric: &e2api.Error_Cause_Ric{
+					Type: e2api.Error_Cause_Ric_CONTROL_TIMER_EXPIRED,
+				},
+			},
+		},
+	}
+	stat, err = status.New(codes.Internal, "RICControlTimerExpired").WithDetails(e2apErr)
+	assert.NoError(t, err)
+	assert.True(t, IsRICControlTimerExpired(FromGRPC(stat.Err())))
+
+	e2apErr = &e2api.Error{
+		Cause: &e2api.Error_Cause{
+			Cause: &e2api.Error_Cause_Ric_{
+				Ric: &e2api.Error_Cause_Ric{
+					Type: e2api.Error_Cause_Ric_CONTROL_FAILED_TO_EXECUTE,
+				},
+			},
+		},
+	}
+	stat, err = status.New(codes.Internal, "RICControlFailedToExecute").WithDetails(e2apErr)
+	assert.NoError(t, err)
+	assert.True(t, IsRICControlFailedToExecute(FromGRPC(stat.Err())))
+
+	e2apErr = &e2api.Error{
+		Cause: &e2api.Error_Cause{
+			Cause: &e2api.Error_Cause_Ric_{
+				Ric: &e2api.Error_Cause_Ric{
+					Type: e2api.Error_Cause_Ric_SYSTEM_NOT_READY,
+				},
+			},
+		},
+	}
+	stat, err = status.New(codes.Internal, "RICSystemNotReady").WithDetails(e2apErr)
+	assert.NoError(t, err)
+	assert.True(t, IsRICSystemNotReady(FromGRPC(stat.Err())))
+
+	e2apErr = &e2api.Error{
+		Cause: &e2api.Error_Cause{
 			Cause: &e2api.Error_Cause_RicService_{
 				RicService: &e2api.Error_Cause_RicService{
 					Type: e2api.Error_Cause_RicService_UNSPECIFIED,
@@ -331,6 +388,7 @@ func TestGRPCToError(t *testing.T) {
 			},
 		},
 	}
+
 	stat, err = status.New(codes.Internal, "RICServiceUnspecified").WithDetails(e2apErr)
 	assert.NoError(t, err)
 	assert.True(t, IsRICServiceUnspecified(FromGRPC(stat.Err())))
@@ -346,7 +404,7 @@ func TestGRPCToError(t *testing.T) {
 	}
 	stat, err = status.New(codes.Internal, "RICServiceFunctionNotRequired").WithDetails(e2apErr)
 	assert.NoError(t, err)
-	assert.True(t, IsRICServiceFunctionNotRequired(FromGRPC(stat.Err())))
+	assert.True(t, IsRICServiceRANFunctionNotSupported(FromGRPC(stat.Err())))
 
 	e2apErr = &e2api.Error{
 		Cause: &e2api.Error_Cause{

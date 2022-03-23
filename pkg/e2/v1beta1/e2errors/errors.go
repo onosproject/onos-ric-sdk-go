@@ -41,9 +41,15 @@ const (
 
 	RICCallProcessIDInvalid
 
+	RicControlTimerExpired
+
+	RicControlFailedToExecute
+
+	RICSystemNotReady
+
 	RICServiceUnspecified
 
-	RICServiceFunctionNotRequired
+	RicServiceRANFunctionNotSupported
 
 	RICServiceExcessiveFunctions
 
@@ -130,6 +136,12 @@ func FromGRPC(err error) error {
 				return New(RICControlMessageInvalid, stat.Message())
 			case e2api.Error_Cause_Ric_CALL_PROCESS_ID_INVALID:
 				return New(RICCallProcessIDInvalid, stat.Message())
+			case e2api.Error_Cause_Ric_CONTROL_TIMER_EXPIRED:
+				return New(RicControlTimerExpired, stat.Message())
+			case e2api.Error_Cause_Ric_CONTROL_FAILED_TO_EXECUTE:
+				return New(RicControlFailedToExecute, stat.Message())
+			case e2api.Error_Cause_Ric_SYSTEM_NOT_READY:
+				return New(RICSystemNotReady, stat.Message())
 			default:
 				return New(RICUnspecified, stat.Message())
 
@@ -169,7 +181,7 @@ func FromGRPC(err error) error {
 			case e2api.Error_Cause_RicService_UNSPECIFIED:
 				return New(RICServiceUnspecified, stat.Message())
 			case e2api.Error_Cause_RicService_RAN_FUNCTION_NOT_SUPPORTED:
-				return New(RICServiceFunctionNotRequired, stat.Message())
+				return New(RicServiceRANFunctionNotSupported, stat.Message())
 			case e2api.Error_Cause_RicService_EXCESSIVE_FUNCTIONS:
 				return New(RICServiceExcessiveFunctions, stat.Message())
 			case e2api.Error_Cause_RicService_RIC_RESOURCE_LIMIT:
@@ -257,14 +269,29 @@ func NewRICCallProcessIDInvalid(msg string, args ...interface{}) error {
 	return New(RICCallProcessIDInvalid, msg, args...)
 }
 
+// NewRICControlTimerExpired returns a new RICControlTimerExpired error
+func NewRICControlTimerExpired(msg string, args ...interface{}) error {
+	return New(RicControlTimerExpired, msg, args...)
+}
+
+// NewRICControlFailedToExecute returns a new RICControlFailedToExecute error
+func NewRICControlFailedToExecute(msg string, args ...interface{}) error {
+	return New(RicControlFailedToExecute, msg, args...)
+}
+
+// NewRICSystemNotReady returns a new RICSystemNotReady error
+func NewRICSystemNotReady(msg string, args ...interface{}) error {
+	return New(RICSystemNotReady, msg, args...)
+}
+
 // NewRICServiceUnspecified returns a new RICServiceUnspecified error
 func NewRICServiceUnspecified(msg string, args ...interface{}) error {
 	return New(RICServiceUnspecified, msg, args...)
 }
 
-// NewRICServiceFunctionNotRequired returns a new 	RICServiceFunctionNotRequired error
-func NewRICServiceFunctionNotRequired(msg string, args ...interface{}) error {
-	return New(RICServiceFunctionNotRequired, msg, args...)
+// NewRICServiceRANFunctionNotSupported returns a new RICServiceRANFunctionNotSupported error
+func NewRICServiceRANFunctionNotSupported(msg string, args ...interface{}) error {
+	return New(RicServiceRANFunctionNotSupported, msg, args...)
 }
 
 // NewRICServiceExcessiveFunctions returns a new RICServiceExcessiveFunctions error
@@ -403,14 +430,29 @@ func IsRICCallProcessIDInvalid(err error) bool {
 	return IsType(err, RICCallProcessIDInvalid)
 }
 
+// IsRICControlTimerExpired checks whether the given error is a RICControlTimerExpired error
+func IsRICControlTimerExpired(err error) bool {
+	return IsType(err, RicControlTimerExpired)
+}
+
+// IsRICControlFailedToExecute checks whether the given error is a RICControlTimerExpired error
+func IsRICControlFailedToExecute(err error) bool {
+	return IsType(err, RicControlFailedToExecute)
+}
+
+// IsRICSystemNotReady checks whether the given error is a RICSystemNotReady error
+func IsRICSystemNotReady(err error) bool {
+	return IsType(err, RICSystemNotReady)
+}
+
 // IsRICServiceUnspecified checks whether the given error is a RICServiceUnspecified error
 func IsRICServiceUnspecified(err error) bool {
 	return IsType(err, RICServiceUnspecified)
 }
 
-// IsRICServiceFunctionNotRequired checks whether the given error is a RICServiceFunctionNotRequired error
-func IsRICServiceFunctionNotRequired(err error) bool {
-	return IsType(err, RICServiceFunctionNotRequired)
+// IsRICServiceRANFunctionNotSupported checks whether the given error is a RICServiceRANFunctionNotSupported error
+func IsRICServiceRANFunctionNotSupported(err error) bool {
+	return IsType(err, RicServiceRANFunctionNotSupported)
 }
 
 // IsRICServiceExcessiveFunctions checks whether the given error is a RICServiceExcessiveFunctions error
