@@ -168,7 +168,7 @@ func FromGRPC(err error) error {
 			switch c.RicService.Type {
 			case e2api.Error_Cause_RicService_UNSPECIFIED:
 				return New(RICServiceUnspecified, stat.Message())
-			case e2api.Error_Cause_RicService_FUNCTION_NOT_REQUIRED:
+			case e2api.Error_Cause_RicService_RAN_FUNCTION_NOT_SUPPORTED:
 				return New(RICServiceFunctionNotRequired, stat.Message())
 			case e2api.Error_Cause_RicService_EXCESSIVE_FUNCTIONS:
 				return New(RICServiceExcessiveFunctions, stat.Message())

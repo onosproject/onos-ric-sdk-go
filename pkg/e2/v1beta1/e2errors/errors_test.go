@@ -339,7 +339,7 @@ func TestGRPCToError(t *testing.T) {
 		Cause: &e2api.Error_Cause{
 			Cause: &e2api.Error_Cause_RicService_{
 				RicService: &e2api.Error_Cause_RicService{
-					Type: e2api.Error_Cause_RicService_FUNCTION_NOT_REQUIRED,
+					Type: e2api.Error_Cause_RicService_RAN_FUNCTION_NOT_SUPPORTED,
 				},
 			},
 		},
