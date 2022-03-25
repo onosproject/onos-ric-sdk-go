@@ -30,6 +30,9 @@ type Node interface {
 	// ID is the node identifier
 	ID() NodeID
 
+	// Context is the node context
+	Context() context.Context
+
 	// Subscribe creates a subscription from the given SubscriptionDetails
 	// The Subscribe method will block until the subscription is successfully registered.
 	// The context.Context represents the lifecycle of this initial subscription process.
@@ -69,9 +72,12 @@ func NewNode(nodeID NodeID, opts ...Option) Node {
 
 	uuid.SetNodeID([]byte(fmt.Sprintf("%s:%s", options.App.AppID, options.App.InstanceID)))
 
+	ctx, cancel := context.WithCancel(context.Background())
 	return &e2Node{
 		nodeID:  nodeID,
 		options: options,
+		ctx:     ctx,
+		cancel:  cancel,
 	}
 }
 
@@ -84,12 +90,18 @@ type ackResult struct {
 type e2Node struct {
 	nodeID  NodeID
 	options Options
+	ctx     context.Context
+	cancel  context.CancelFunc
 	conn    *grpc.ClientConn
 	mu      sync.RWMutex
 }
 
 func (n *e2Node) ID() NodeID {
 	return n.nodeID
+}
+
+func (n *e2Node) Context() context.Context {
+	return n.ctx
 }
 
 func (n *e2Node) connect(ctx context.Context) (*grpc.ClientConn, error) {
@@ -271,5 +283,6 @@ func (n *e2Node) Unsubscribe(ctx context.Context, name string) error {
 }
 
 func (n *e2Node) Close() error {
+	defer n.cancel()
 	return n.conn.Close()
 }
