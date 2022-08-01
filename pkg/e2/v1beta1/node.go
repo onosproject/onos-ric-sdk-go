@@ -46,7 +46,7 @@ type Node interface {
 	Unsubscribe(ctx context.Context, name string) error
 
 	// Control creates and sends a E2 control message and awaits the outcome
-	Control(ctx context.Context, message *e2api.ControlMessage) (*e2api.ControlOutcome, error)
+	Control(ctx context.Context, message *e2api.ControlMessage, ricCallProcessID []byte) (*e2api.ControlOutcome, error)
 }
 
 // NewNode creates a new E2 Node with the given ID
@@ -159,7 +159,7 @@ func (n *e2Node) getRequestHeaders() e2api.RequestHeaders {
 	}
 }
 
-func (n *e2Node) Control(ctx context.Context, message *e2api.ControlMessage) (*e2api.ControlOutcome, error) {
+func (n *e2Node) Control(ctx context.Context, message *e2api.ControlMessage, callProcessID []byte) (*e2api.ControlOutcome, error) {
 	conn, err := n.connect(ctx)
 	if err != nil {
 		return nil, err
@@ -169,6 +169,9 @@ func (n *e2Node) Control(ctx context.Context, message *e2api.ControlMessage) (*e
 	request := &e2api.ControlRequest{
 		Headers: n.getRequestHeaders(),
 		Message: *message,
+	}
+	if callProcessID != nil {
+		request.CallProcessId = callProcessID
 	}
 	log.Debugf("Sending ControlRequest %+v", request)
 	response, err := client.Control(ctx, request)
