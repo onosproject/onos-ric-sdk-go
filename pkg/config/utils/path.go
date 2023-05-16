@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+// Package utils :
 package utils
 
 import (
@@ -102,22 +103,22 @@ var (
 //
 // Within a List key value string, '/', '[' and ']' are treated differently:
 //
-//	1. A '/' does not act as a separator, and is allowed to be part of a
-//	List key leaf value.
+//  1. A '/' does not act as a separator, and is allowed to be part of a
+//     List key leaf value.
 //
-//	2. A '[' is allowed within a List key value. '[' and `\[` are
-//	equivalent within a List key value.
+//  2. A '[' is allowed within a List key value. '[' and `\[` are
+//     equivalent within a List key value.
 //
-//	3. If a ']' needs to be part of a List key value, it must be escaped as
-//	'\]'. The first unescaped ']' terminates a List key value string.
+//  3. If a ']' needs to be part of a List key value, it must be escaped as
+//     '\]'. The first unescaped ']' terminates a List key value string.
 //
 // Outside of any List key value pair string:
 //
-//	1. A ']' without a matching '[' does not generate any error in this
-//	API. This error is caught later by another API.
+//  1. A ']' without a matching '[' does not generate any error in this
+//     API. This error is caught later by another API.
 //
-//	2. A '[' without an closing ']' is treated as an error, because it
-//	indicates an incomplete List key leaf value string.
+//  2. A '[' without an closing ']' is treated as an error, because it
+//     indicates an incomplete List key leaf value string.
 //
 // For example, "/a/b/c" is split into []string{"a", "b", "c"}.
 // "/a/b[k=eth1/1]/c" is split into []string{"a", "b[k=eth1/1]", "c"}.
@@ -187,8 +188,11 @@ func splitPath(str string) ([]string, error) {
 // valid YANG identifiers, v1 and v2 can be any non-empty strings where any ']'
 // must be escapced by an '\'. Any malformed key-value pair generates an error.
 // For example, given
+//
 //	"[k1=v1][k2=v2]",
+//
 // this API returns
+//
 //	map[string]string{"k1": "v1", "k2": "v2"}.
 func parseKeyValueString(str string) (map[string]string, error) {
 	keyValuePairs := make(map[string]string)
@@ -256,10 +260,15 @@ func parseKeyValueString(str string) (map[string]string, error) {
 // name and List key value pair(s). List key value pairs are saved in a
 // map[string]string whose key is List key leaf name and whose value is the
 // string representation of List key leaf value. For example, given
+//
 //	"list-name[k1=v1]",
+//
 // this API returns
+//
 //	[]interface{}{"list-name", map[string]string{"k1": "v1"}}.
+//
 // Multi-key List elements follow a similar pattern:
+//
 //	list-name[k1=v1]...[kN=vN].
 func parseElement(elem string) ([]interface{}, error) {
 	i := strings.Index(elem, "[")
@@ -291,8 +300,11 @@ func parseElement(elem string) ([]interface{}, error) {
 // representation. A '/' within a List key value pair string, i.e., between a
 // pair of '[' and ']', does not serve as a path separator, and is allowed to be
 // part of a List key leaf value. For example, given a string path:
+//
 //	"/a/list-name[k=v/v]/c",
+//
 // this API returns:
+//
 //	[]interface{}{"a", "list-name", map[string]string{"k": "v/v"}, "c"}.
 //
 // String path parsing consists of two passes. In the first pass, the input
@@ -300,11 +312,14 @@ func parseElement(elem string) ([]interface{}, error) {
 // key value string, i.e, a '[' which starts a List key value string without a
 // closing ']', in input string generates an error. In the above example, this
 // pass produces:
+//
 //	[]string{"a", "list-name[k=v/v]", "c"}.
+//
 // In the second pass, each element in split []string is parsed checking syntax
 // and pattern correctness. Errors are generated for invalid YANG identifiers,
 // malformed List key-value string, etc.. In the above example, the second pass
 // produces:
+//
 //	[]interface{}{"a", "list-name", map[string]string{"k", "v/v"}, "c"}.
 func ParseStringPath(stringPath string) ([]interface{}, error) {
 	elems, err := splitPath(stringPath)
@@ -333,16 +348,16 @@ func ParseStringPath(stringPath string) ([]interface{}, error) {
 // For example, xpath /interfaces/interface[name=Ethernet1/2/3]/state/counters
 // will be parsed to:
 //
-//    elem: <name: "interfaces" >
-//    elem: <
-//        name: "interface"
-//        key: <
-//            key: "name"
-//            value: "Ethernet1/2/3"
-//        >
-//    >
-//    elem: <name: "state" >
-//    elem: <name: "counters" >
+//	elem: <name: "interfaces" >
+//	elem: <
+//	    name: "interface"
+//	    key: <
+//	        key: "name"
+//	        value: "Ethernet1/2/3"
+//	    >
+//	>
+//	elem: <name: "state" >
+//	elem: <name: "counters" >
 func ToGNMIPath(xpath string) (*pb.Path, error) {
 	xpathElements, err := ParseStringPath(xpath)
 	if err != nil {

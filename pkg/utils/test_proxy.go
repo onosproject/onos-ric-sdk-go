@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"github.com/onosproject/onos-lib-go/pkg/certs"
 	"github.com/onosproject/onos-proxy/pkg/manager"
-	"io/ioutil"
 	"os"
 )
 
@@ -38,7 +37,7 @@ func StartTestProxy() {
 }
 
 func writeFile(file string, s string) {
-	err := ioutil.WriteFile(file, []byte(s), 0644)
+	err := os.WriteFile(file, []byte(s), 0644)
 	if err != nil {
 		fmt.Printf("error writing generated code to file: %s\n", err)
 		os.Exit(-1)

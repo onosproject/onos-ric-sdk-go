@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+// Package a1endpoint :
 package a1endpoint
 
 // NewServer creates a new server struct

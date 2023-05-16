@@ -5,7 +5,7 @@
 package registry
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 )
 
@@ -18,7 +18,7 @@ func loadConfig(jsonPath string) ([]byte, error) {
 	}
 	defer jsonFile.Close()
 
-	byteValue, err := ioutil.ReadAll(jsonFile)
+	byteValue, err := io.ReadAll(jsonFile)
 	if err != nil {
 		return nil, err
 	}

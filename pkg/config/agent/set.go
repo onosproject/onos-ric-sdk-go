@@ -12,7 +12,7 @@ import (
 )
 
 // Set implements the Set RPC in gNMI spec.
-func (s *Server) Set(ctx context.Context, req *pb.SetRequest) (*pb.SetResponse, error) {
+func (s *Server) Set(_ context.Context, req *pb.SetRequest) (*pb.SetResponse, error) {
 	log.Debugf("Processing Set Request:%+v", req)
 	s.mu.Lock()
 	defer s.mu.Unlock()
