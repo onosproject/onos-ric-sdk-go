@@ -12,7 +12,7 @@ import (
 )
 
 // Get implements the Get RPC in gNMI spec.
-func (s *Server) Get(ctx context.Context, req *pb.GetRequest) (*pb.GetResponse, error) {
+func (s *Server) Get(_ context.Context, req *pb.GetRequest) (*pb.GetResponse, error) {
 	log.Debugf("Processing Get Request: %+v", req)
 	s.mu.RLock()
 	defer s.mu.RUnlock()

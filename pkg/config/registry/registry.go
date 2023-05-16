@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+// Package registry :
 package registry
 
 import (
@@ -63,7 +64,7 @@ func startAgent(c configurable.Configurable) error {
 }
 
 // RegisterConfigurable registers a configurable entity and starts a gNMI agent server
-func RegisterConfigurable(jsonPath string, req *RegisterRequest) (RegisterResponse, error) {
+func RegisterConfigurable(jsonPath string, _ *RegisterRequest) (RegisterResponse, error) {
 	initialConfig, err := loadConfig(jsonPath)
 	if err != nil {
 		log.Error("Failed to read initial config", err)

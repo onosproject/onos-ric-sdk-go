@@ -11,6 +11,6 @@ import (
 )
 
 // Capabilities returns supported encodings and supported models.
-func (s *Server) Capabilities(ctx context.Context, req *pb.CapabilityRequest) (*pb.CapabilityResponse, error) {
+func (s *Server) Capabilities(_ context.Context, _ *pb.CapabilityRequest) (*pb.CapabilityResponse, error) {
 	return &pb.CapabilityResponse{}, nil
 }
