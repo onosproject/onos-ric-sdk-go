@@ -7,6 +7,7 @@ package topo
 import (
 	"context"
 	"github.com/onosproject/onos-lib-go/pkg/grpc/retry"
+	"google.golang.org/grpc/credentials/insecure"
 	"io"
 
 	"github.com/onosproject/onos-lib-go/pkg/errors"
@@ -62,7 +63,7 @@ func NewClient(opts ...Option) (Client, error) {
 		grpc.WithStreamInterceptor(retry.RetryingStreamClientInterceptor()),
 	}
 	if clientOptions.Service.Insecure {
-		dialOpts = append(dialOpts, grpc.WithInsecure())
+		dialOpts = append(dialOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	} else {
 		tlsConfig, err := creds.GetClientCredentials()
 		if err != nil {

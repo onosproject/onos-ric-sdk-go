@@ -40,21 +40,6 @@ func ToUint64(value interface{}) (uint64, error) {
 
 }
 
-// ToFloat converts an interface value to float
-func ToFloat(value interface{}) (float32, error) {
-	switch v := value.(type) {
-	case *gnmi.TypedValue:
-		return toGnmiTypedValue(value).GetFloatVal(), nil
-
-	case float32:
-		return v, nil
-
-	default:
-		return 0, errors.New(errors.NotSupported, "Not supported type %v", v)
-	}
-
-}
-
 // ToString converts value to string
 func ToString(value interface{}) (string, error) {
 	switch v := value.(type) {
