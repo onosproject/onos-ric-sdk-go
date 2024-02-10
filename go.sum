@@ -212,8 +212,8 @@ github.com/onosproject/onos-lib-go v0.10.24 h1:CX/6a0U2ZAhHeYiZnmO+kOIoLv8V+aim0
 github.com/onosproject/onos-lib-go v0.10.24/go.mod h1:xprZr/FtQ8YhDxA3WI7AqMUzK97QJvrsrrmY5KiX46I=
 github.com/onosproject/onos-proxy v0.1.3 h1:np6URH3ETJVLHvJCn+QmOk0FvTIkopuM4NXRrcebDxc=
 github.com/onosproject/onos-proxy v0.1.3/go.mod h1:z5EPl9Xv4lWTn5WtrpxxZCZqe6SFYaGLSnkRBUSKEgc=
-github.com/openconfig/gnmi v0.9.1 h1:hVOdLTaRjdy68oCGJbkf2vrmnUoQ5xbINqBOAMix4xM=
-github.com/openconfig/gnmi v0.9.1/go.mod h1:Y9os75GmSkhHw2wX8sMsxfI7qRGAEcDh8NTa5a8vj6E=
+github.com/openconfig/gnmi v0.10.0 h1:kQEZ/9ek3Vp2Y5IVuV2L/ba8/77TgjdXg505QXvYmg8=
+github.com/openconfig/gnmi v0.10.0/go.mod h1:Y9os75GmSkhHw2wX8sMsxfI7qRGAEcDh8NTa5a8vj6E=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
 github.com/pelletier/go-toml v1.9.4 h1:tjENF6MfZAg8e4ZmZTeWaWiT2vXtsoO6+iuOjFhECwM=
 github.com/pelletier/go-toml v1.9.4/go.mod h1:u1nR/EPcESfeI/szUZKdtJ0xRNbUoANCkoOuaOx1Y+c=
