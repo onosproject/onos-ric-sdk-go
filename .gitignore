@@ -27,3 +27,4 @@
 
 build/build-tools
 vendor
+venv
