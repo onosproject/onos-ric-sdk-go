@@ -6,7 +6,7 @@ require (
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
-	github.com/onosproject/onos-api/go v0.10.31
+	github.com/onosproject/onos-api/go v0.10.33
 	github.com/onosproject/onos-lib-go v0.10.24
 	github.com/onosproject/onos-proxy v0.1.3
 	github.com/openconfig/gnmi v0.9.1
