@@ -1,14 +1,25 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2024 Intel Corporation
 
-name: Master workflow
+name: Code scan workflow
+
 on:
+  pull_request:
+    branches:
+      - master
   push:
     branches:
       - master
-  pull_request:
 
 jobs:
+  version-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: check version
+        run: make check-version
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -16,33 +27,18 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-      - uses: golangci/golangci-lint-action@v6.0.1
-        with:
-          version: latest
-          args: -v --config ./.golangci.yml
-
-  unit-tests:
+      - name: golang-lint
+        run: make lint
+  license:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
-      - name: Unit tests
-        run: go test github.com/onosproject/onos-ric-sdk-go/pkg/...
-
-  license-check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: reuse lint
-        uses: fsfe/reuse-action@v3
-
+      - name: check license
+        run: make license
   fossa-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: FOSSA scan
         uses: fossa-contrib/fossa-action@v3
         with:

@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
-#
 # SPDX-License-Identifier: Apache-2.0
+# Copyright 2019 Open Networking Foundation
+# Copyright 2024 Intel Corporation
 
 export CGO_ENABLED=1
 export GO111MODULE=on
@@ -8,32 +8,39 @@ export GO111MODULE=on
 .PHONY: build
 
 ONOS_PROTOC_VERSION := v0.6.3
+GOLANG_CI_VERSION := v1.52.2
 
-all: test
+all: build
 
-build-tools:=$(shell if [ ! -d "./build/build-tools" ]; then cd build && git clone https://github.com/onosproject/build-tools.git; fi)
-include ./build/build-tools/make/onf-common.mk
-
-mod-update: # @HELP Download the dependencies to the vendor folder
-	go mod tidy
-	go mod vendor
-mod-lint: mod-update # @HELP ensure that the required dependencies are in place
-	# dependencies are vendored, but not committed, go.sum is the only thing we need to check
-	bash -c "diff -u <(echo -n) <(git diff go.sum)"
+build: # @HELP compile Golang sources
+	go build ./...
 
 test: # @HELP run the unit tests and source code validation
-test: mod-lint linters license
+test: build lint license
 	go test github.com/onosproject/onos-ric-sdk-go/pkg/...
 
-jenkins-test:  # @HELP run the unit tests and source code validation producing a junit style report for Jenkins
-jenkins-test: mod-lint linters license
-	TEST_PACKAGES=github.com/onosproject/onos-ric-sdk-go/pkg/... ./build/build-tools/build/jenkins/make-unit
+lint: # @HELP examines Go source code and reports coding problems
+	golangci-lint --version | grep $(GOLANG_CI_VERSION) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b `go env GOPATH`/bin $(GOLANG_CI_VERSION)
+	golangci-lint run --timeout 15m
 
-publish: # @HELP publish version on github and dockerhub
-	./build/build-tools/publish-version ${VERSION}
+license: # @HELP run license checks
+	rm -rf venv
+	python3 -m venv venv
+	. ./venv/bin/activate;\
+	python3 -m pip install --upgrade pip;\
+	python3 -m pip install reuse;\
+	reuse lint
 
-jenkins-publish: # @HELP Jenkins calls this to publish artifacts
-	./build/build-tools/release-merge-commit
+check-version: # @HELP check version is duplicated
+	./build/bin/version_check.sh all
 
 clean:: # @HELP remove all the build artifacts
 	rm -rf ./build/_output ./vendor
+
+help:
+	@grep -E '^.*: *# *@HELP' $(MAKEFILE_LIST) \
+    | sort \
+    | awk ' \
+        BEGIN {FS = ": *# *@HELP"}; \
+        {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}; \
+    '
