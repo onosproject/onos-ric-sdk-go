@@ -9,7 +9,7 @@ require (
 	github.com/onosproject/onos-api/go v0.10.31
 	github.com/onosproject/onos-lib-go v0.10.24
 	github.com/onosproject/onos-proxy v0.1.3
-	github.com/openconfig/gnmi v0.9.1
+	github.com/openconfig/gnmi v0.11.0
 	github.com/stretchr/testify v1.8.2
 	golang.org/x/net v0.8.0
 	google.golang.org/grpc v1.54.0
