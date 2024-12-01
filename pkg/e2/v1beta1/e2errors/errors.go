@@ -42,6 +42,12 @@ const (
 
 	RICCallProcessIDInvalid
 
+	RICControlTimerExpired
+
+	RICControlFailedToExecute
+
+	RICControlSystemNotReady
+
 	RICServiceUnspecified
 
 	RICServiceFunctionNotRequired
@@ -131,6 +137,12 @@ func FromGRPC(err error) error {
 				return New(RICControlMessageInvalid, stat.Message())
 			case e2api.Error_Cause_Ric_CALL_PROCESS_ID_INVALID:
 				return New(RICCallProcessIDInvalid, stat.Message())
+			case e2api.Error_Cause_Ric_CONTROL_TIMER_EXPIRED:
+				return New(RICControlTimerExpired, stat.Message())
+			case e2api.Error_Cause_Ric_CONTROL_FAILED_TO_EXECUTE:
+				return New(RICControlFailedToExecute, stat.Message())
+			case e2api.Error_Cause_Ric_CONTROL_SYSTEM_NOT_READY:
+				return New(RICControlSystemNotReady, stat.Message())
 			default:
 				return New(RICUnspecified, stat.Message())
 
@@ -256,6 +268,21 @@ func NewRICControlMessageInvalid(msg string, args ...interface{}) error {
 // NewRICCallProcessIDInvalid returns a new RICCallProcessIDInvalid error
 func NewRICCallProcessIDInvalid(msg string, args ...interface{}) error {
 	return New(RICCallProcessIDInvalid, msg, args...)
+}
+
+// NewRICControlTimerExpired returns a new RICControlTimerExpired error
+func NewRICControlTimerExpired(msg string, args ...interface{}) error {
+	return New(RICControlTimerExpired, msg, args...)
+}
+
+// NewRICControlFailedToExecute returns a new RICControlFailedToExecute error
+func NewRICControlFailedToExecute(msg string, args ...interface{}) error {
+	return New(RICControlFailedToExecute, msg, args...)
+}
+
+// NewRICControlSystemNotReady returns a new RICControlSystemNotReady error
+func NewRICControlSystemNotReady(msg string, args ...interface{}) error {
+	return New(RICControlSystemNotReady, msg, args...)
 }
 
 // NewRICServiceUnspecified returns a new RICServiceUnspecified error
@@ -402,6 +429,21 @@ func IsRICControlMessageInvalid(err error) bool {
 // IsRICCallProcessIDInvalid checks whether the given error is a RICCallProcessIDInvalid error
 func IsRICCallProcessIDInvalid(err error) bool {
 	return IsType(err, RICCallProcessIDInvalid)
+}
+
+// IsRICControlTimerExpired checks whether the given error is a RICControlTimerExpired error
+func IsRICControlTimerExpired(err error) bool {
+	return IsType(err, RICControlTimerExpired)
+}
+
+// IsRICControlFailedToExecute checks whether the given error is a RICControlFailedToExecute error
+func IsRICControlFailedToExecute(err error) bool {
+	return IsType(err, RICControlFailedToExecute)
+}
+
+// IsRICControlSystemNotReady checks whether the given error is a RICControlSystemNotReady error
+func IsRICControlSystemNotReady(err error) bool {
+	return IsType(err, RICControlSystemNotReady)
 }
 
 // IsRICServiceUnspecified checks whether the given error is a RICServiceUnspecified error
